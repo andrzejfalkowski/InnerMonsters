@@ -12,6 +12,7 @@ public enum EGameState
 public class GameController : MonoBehaviour 
 {
 	public CameraMgr CameraManager;
+	public Camera MainCamera;
 
 	public Transform LevelParent;
 	public Level CurrentLevel;	
@@ -33,7 +34,7 @@ public class GameController : MonoBehaviour
 	const float FLOOR_HEIGHT = 1.6f;
 	const float BUILDING_WIDTH = 8f;
 
-	const int BUILDING_MIN_BASE_LEVEL = -2;
+	const int BUILDING_MIN_BASE_LEVEL = -1;
 	const int BUILDING_MAX_BASE_LEVEL = 0;
 
 	const int BUILDING_MIN_AMOUNT = 3;
@@ -65,6 +66,8 @@ public class GameController : MonoBehaviour
 
 	void Awake()
 	{
+		MainCamera.orthographicSize = 4.0f;
+
 		StartNewGame();
 	}
 
