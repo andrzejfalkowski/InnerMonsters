@@ -117,6 +117,10 @@ public class Floor : MonoBehaviour
 		newColor.a = alpha;
 
 		ForegroundSpriteRenderer.color = newColor;
+
+		newColor = ForegroundPatternSpriteRenderer.color;
+		newColor.a = alpha;
+
 		ForegroundPatternSpriteRenderer.color = newColor;
 	}
 
