@@ -48,7 +48,7 @@ public class GameController : MonoBehaviour
 	{
 		GenerateLevel ();
 		
-		CameraManager.currentFloor = CurrentFloor;
+		ResetPlayerState();
 	}
 
 	// Use this for initialization
@@ -179,9 +179,14 @@ public class GameController : MonoBehaviour
 
 			allGeneratedFloors.RemoveAt(selectedFloorIndex);
 		}
+	}
 
+	void ResetPlayerState()
+	{
 		CurrentBuildingIndex = 0;
 		CurrentFloorIndex = 0 - CurrentBuilding.BaseLevel;
+
+		CameraManager.currentFloor = CurrentFloor;
 	}
 
 	void ClearLevel()
