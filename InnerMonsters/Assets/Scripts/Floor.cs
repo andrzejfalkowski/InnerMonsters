@@ -13,6 +13,7 @@ public enum EBackgroundType
 }
 
 public enum Dir { N, E, S, W, NONE }
+enum Fade { NONE, IN, OUT }
 
 public class Floor : MonoBehaviour 
 {
@@ -26,7 +27,8 @@ public class Floor : MonoBehaviour
 	public PickableObject Pickable;
 	public Floor[] nextFloors = new Floor[4];
 
-	private const float FADE_SPEED = 0.2f;
+	private Fade fade = Fade.NONE;
+	private const float FADE_SPEED = 0.05f;
 
 	public float GetDistanceToFloor( Dir dir )
 	{
@@ -88,28 +90,46 @@ public class Floor : MonoBehaviour
 
 	public void Reveal( bool reveal )
 	{
-		StartCoroutine( reveal ? FadeOut() : FadeIn() );
+		fade = ( reveal ? Fade.OUT : Fade.IN );
 	}
 
-	IEnumerator FadeIn() 
+	void StopFade( float alpha )
 	{
-		while( ForegroundSpriteRenderer.color.a < 1.0f ) 
-		{
-			Color newColor = ForegroundSpriteRenderer.color;
-			newColor.a += FADE_SPEED;
-			ForegroundSpriteRenderer.color = newColor;
-			yield return new WaitForSeconds( 0.1f ); // Random.Range(5, 10) );
-		}
+		Color newColor = ForegroundSpriteRenderer.color;
+		newColor.a = alpha;
+		ForegroundSpriteRenderer.color = newColor;
+		fade = Fade.NONE;
 	}
 
-	IEnumerator FadeOut() 
+	void FixedUpdate()
 	{
-		while( ForegroundSpriteRenderer.color.a > 0.0f ) 
+		switch( fade )
 		{
-			Color newColor = ForegroundSpriteRenderer.color;
-			newColor.a -= FADE_SPEED * 2.0f;
-			ForegroundSpriteRenderer.color = newColor;
-			yield return new WaitForSeconds( 0.1f ); // Random.Range(5, 10) );
+			case Fade.IN:
+			{
+				Color newColor = ForegroundSpriteRenderer.color;
+				newColor.a += FADE_SPEED;
+
+				if( newColor.a < 1.0f ) 
+					ForegroundSpriteRenderer.color = newColor;
+				else
+					StopFade( 1.0f );
+
+				break;
+			}
+
+			case Fade.OUT:
+			{
+				Color newColor = ForegroundSpriteRenderer.color;
+				newColor.a -= FADE_SPEED * 2.0f;	// Fade out at double velocity than Fade in
+
+				if( newColor.a > 0.0f ) 
+					ForegroundSpriteRenderer.color = newColor;
+				else
+					StopFade( 0.0f );
+
+				break;
+			}
 		}
 	}
 }

@@ -13,6 +13,7 @@ public class CameraMgr : MonoBehaviour
 	private Vector3 startPosition = Vector3.zero;
 	private bool travelling = false;
 	private Vector3 targetPosition = Vector3.zero;
+	private Dir travellingDirection = Dir.NONE;
 
 	private const float TRAVEL_TIME = 3.0f;
 
@@ -43,9 +44,14 @@ public class CameraMgr : MonoBehaviour
 
 		currentFloor.Reveal( false );
 		currentFloor = currentFloor.nextFloors[ (int)dir ];
+
+		if( dir == Dir.N || dir == Dir.S )
+			currentFloor.Reveal( true );
+
 		travelling = true;
 
 		targetPosition = new Vector3(currentFloor.transform.position.x, currentFloor.transform.position.y, startPosition.z);
+		travellingDirection = dir;
 	}
 
 	void UpdateArrows()
@@ -67,10 +73,13 @@ public class CameraMgr : MonoBehaviour
 
 			if( percentageCovered > 1.0f )
 			{
+				if( travellingDirection == Dir.E || travellingDirection == Dir.W )
+					currentFloor.Reveal( true );
+
 				transform.position = targetPosition;
 				travelling = false;
+				travellingDirection = Dir.NONE;
 				UpdateArrows();
-				currentFloor.Reveal( true );
 			}
 			else
 			{
