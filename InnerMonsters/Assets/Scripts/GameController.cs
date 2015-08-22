@@ -2,6 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 
+public enum EGameState
+{
+	Preparation,
+	GamePlay,
+	GameOver
+}
+
 public class GameController : MonoBehaviour 
 {
 	public CameraMgr CameraManager;
@@ -35,6 +42,18 @@ public class GameController : MonoBehaviour
 	const int BUILDING_MIN_HEIGHT = 2;
 	const int BUILDING_MAX_HEIGHT = 4;
 
+	const float TIME_LEFT = 30f;
+	const float TIME_REWARD = 5f;
+
+	public float TimeLeft = 0f;
+	public float TimePlayed = 0f;
+	public int Score = 0;
+
+	public UnityEngine.UI.Text Timer;
+	public UnityEngine.UI.Text GameOverText;
+
+	public EGameState CurrentGameState;
+
 	public Building CurrentBuilding
 	{
 		get{ return CurrentLevel.Buildings[CurrentBuildingIndex]; }
@@ -46,9 +65,7 @@ public class GameController : MonoBehaviour
 
 	void Awake()
 	{
-		GenerateLevel ();
-		
-		ResetPlayerState();
+		StartNewGame();
 	}
 
 	// Use this for initialization
@@ -60,7 +77,39 @@ public class GameController : MonoBehaviour
 	// Update is called once per frame
 	void Update() 
 	{
-	
+		if(CurrentGameState == EGameState.GamePlay)
+		{
+			if(TimeLeft < 0f)
+			{
+				TimeLeft = 0f;
+
+				GameOverText.gameObject.SetActive(true);
+				GameOverText.text = "GAME OVER\nPathetic lives ruined: " + Score.ToString() +  "\nTime wasted: " + ((int)TimePlayed).ToString() + "s\nPress space to try again";
+
+				CurrentGameState = EGameState.GameOver;
+			}
+			else
+			{
+				TimeLeft -= Time.deltaTime;
+				TimePlayed += Time.deltaTime;
+			}
+			Timer.text = "Time Left: " + ((int)TimeLeft).ToString() + "s";
+		}
+
+		if(CurrentGameState == EGameState.GameOver)
+		{
+			if(Input.GetKey("space"))
+			{
+				StartNewGame();
+			}
+		}
+	}
+
+	void StartNewGame()
+	{
+		GenerateLevel();
+		
+		ResetPlayerState();
 	}
 
 	void GenerateLevel()
@@ -187,6 +236,14 @@ public class GameController : MonoBehaviour
 		CurrentFloorIndex = 0 - CurrentBuilding.BaseLevel;
 
 		CameraManager.currentFloor = CurrentFloor;
+
+		TimeLeft = TIME_LEFT;
+		TimePlayed = 0f;
+		Score = 0;
+
+		CurrentGameState = EGameState.GamePlay;
+
+		GameOverText.gameObject.SetActive(false);
 	}
 
 	void ClearLevel()
@@ -238,7 +295,12 @@ public class GameController : MonoBehaviour
 		if (CurrentlyPickedUpObject != null && CurrentFloor.Person != null)
 		{
 			if(CurrentlyPickedUpObject.CanBeUsedOn(CurrentFloor.Person))
+			{
 				CurrentFloor.Person.UseObjectOn(CurrentlyPickedUpObject);
+
+				TimeLeft += TIME_LEFT;
+				Score++;
+			}
 		}
 	}
 }
