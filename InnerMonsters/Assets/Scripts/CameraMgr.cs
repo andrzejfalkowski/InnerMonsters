@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Assertions;
 using System.Collections;
 
 public class CameraMgr : MonoBehaviour 
@@ -15,6 +16,12 @@ public class CameraMgr : MonoBehaviour
 	private Vector3 targetPosition = Vector3.zero;
 
 	private const float TRAVEL_TIME = 3.0f;
+
+	void Start()
+	{
+		Assert.IsNotNull<Floor>( currentFloor );
+		UpdateArrows();
+	}
 
 	public void GoTo( int dir )
 	{
