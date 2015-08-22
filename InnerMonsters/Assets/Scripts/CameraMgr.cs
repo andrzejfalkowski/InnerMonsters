@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Assertions;
+//using UnityEngine.Assertions;
 using System.Collections;
 
 public class CameraMgr : MonoBehaviour 
@@ -19,7 +19,7 @@ public class CameraMgr : MonoBehaviour
 
 	void Start()
 	{
-		Assert.IsNotNull<Floor>( currentFloor );
+		//Assert.IsNotNull<Floor>( currentFloor );
 		UpdateArrows();
 	}
 
