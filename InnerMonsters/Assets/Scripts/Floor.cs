@@ -21,6 +21,7 @@ public class Floor : MonoBehaviour
 	public SpriteRenderer BackgroundSpriteRenderer;
 	public SpriteRenderer BackgroundFrameSpriteRenderer;
 	public SpriteRenderer ForegroundSpriteRenderer;
+	public SpriteRenderer ForegroundPatternSpriteRenderer;
 
 	public PersonOfInterest Person;
 	public PickableObject Pickable;
@@ -47,6 +48,7 @@ public class Floor : MonoBehaviour
 	public List<Sprite> ForegroundBottomSprites;
 	public List<Sprite> ForegroundTopSprites;
 	public List<Sprite> ForegroundBasementSprites;
+	public List<Sprite> ForegroundPatternSprites;
 
 	// Use this for initialization
 //	void Start () {
@@ -58,7 +60,7 @@ public class Floor : MonoBehaviour
 //	
 //	}
 
-	public void Init(EFacadeType facadeType, EFrameType frameType, bool isTopFloor, bool isBottomFloor, bool isBasement)
+	public void Init(EFacadeType facadeType, EFrameType frameType, Color patternColor, bool isTopFloor, bool isBottomFloor, bool isBasement)
 	{
 		System.Array backgroundValues = System.Enum.GetValues(typeof(EBackgroundType));
 		BackgroundType = (EBackgroundType)backgroundValues.GetValue(UnityEngine.Random.Range(0, backgroundValues.Length));
@@ -84,6 +86,16 @@ public class Floor : MonoBehaviour
 		}
 
 		BackgroundFrameSpriteRenderer.sprite = BackgroundFrameSprites [(int)frameType];
+
+		if (isBasement)
+		{
+			ForegroundPatternSpriteRenderer.sprite = null;
+		}
+		else
+		{
+			ForegroundPatternSpriteRenderer.sprite = ForegroundPatternSprites[UnityEngine.Random.Range (0, ForegroundPatternSprites.Count)];
+			ForegroundPatternSpriteRenderer.color = patternColor;
+		}
 	}
 
 	public void Reveal( bool reveal )
@@ -98,6 +110,11 @@ public class Floor : MonoBehaviour
 			Color newColor = ForegroundSpriteRenderer.color;
 			newColor.a += FADE_SPEED;
 			ForegroundSpriteRenderer.color = newColor;
+
+			newColor = ForegroundPatternSpriteRenderer.color;
+			newColor.a += FADE_SPEED;
+			ForegroundPatternSpriteRenderer.color = newColor;
+
 			yield return new WaitForSeconds( 0.1f ); // Random.Range(5, 10) );
 		}
 	}
@@ -109,6 +126,11 @@ public class Floor : MonoBehaviour
 			Color newColor = ForegroundSpriteRenderer.color;
 			newColor.a -= FADE_SPEED * 2.0f;
 			ForegroundSpriteRenderer.color = newColor;
+
+			newColor = ForegroundPatternSpriteRenderer.color;
+			newColor.a -= FADE_SPEED * 2.0f;
+			ForegroundPatternSpriteRenderer.color = newColor;
+
 			yield return new WaitForSeconds( 0.1f ); // Random.Range(5, 10) );
 		}
 	}
