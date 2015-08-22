@@ -13,8 +13,8 @@ public class Blink : MonoBehaviour
 
 	public void FixedUpdate()
 	{
-		Color newColor = img.material.color;
+		Color newColor = img.color;
 		newColor.a = ( Mathf.Sin(Time.time*2.0f) * 0.4f ) + 0.6f;
-		img.material.color = newColor;
+		img.color = newColor;
 	}
 }
