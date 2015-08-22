@@ -25,11 +25,16 @@ public class Building : MonoBehaviour
 	{
 		get { return Floors.Count + BaseLevel; }
 	}
-
 	
 	public void Init()
 	{
 		System.Array facadeValues = System.Enum.GetValues (typeof(EFacadeType));
 		FacadeType = (EFacadeType)facadeValues.GetValue (UnityEngine.Random.Range (0, facadeValues.Length));
-	}	
+	}
+
+	public Floor GetGroundFloor()
+	{
+		return Floors[0 - BaseLevel];
+	}
+
 }

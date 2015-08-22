@@ -12,6 +12,7 @@ public class CameraMgr : MonoBehaviour
 	private float travelDistance = 0.0f;
 	private Vector3 startPosition = Vector3.zero;
 	private bool travelling = false;
+	private Vector3 targetPosition = Vector3.zero;
 
 	private const float TRAVEL_TIME = 3.0f;
 
@@ -27,6 +28,8 @@ public class CameraMgr : MonoBehaviour
 		startPosition = transform.position;
 		currentFloor = currentFloor.nextFloors[ (int)dir ];
 		travelling = true;
+
+		targetPosition = new Vector3(currentFloor.transform.position.x, currentFloor.transform.position.y, startPosition.z);
 	}
 
 	void UpdateArrows()
@@ -47,13 +50,13 @@ public class CameraMgr : MonoBehaviour
 
 			if( percentageCovered > 1.0f )
 			{
-				transform.position = currentFloor.transform.position;
+				transform.position = targetPosition;
 				travelling = false;
 				UpdateArrows();
 			}
 			else
 			{
-				transform.position = Vector3.Lerp( startPosition, currentFloor.transform.position, percentageCovered );
+				transform.position = Vector3.Lerp( startPosition, targetPosition, percentageCovered );
 			}
 		}
 	}

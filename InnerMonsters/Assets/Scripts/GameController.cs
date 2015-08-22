@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class GameController : MonoBehaviour 
 {
+	public CameraMgr CameraManager;
+
 	public Transform LevelParent;
 	public Level CurrentLevel;	
 	[System.NonSerialized]
@@ -46,6 +48,8 @@ public class GameController : MonoBehaviour
 	void Start () 
 	{
 		GenerateLevel ();
+
+		CameraManager.currentFloor = CurrentFloor;
 	}
 	
 	// Update is called once per frame
@@ -99,8 +103,22 @@ public class GameController : MonoBehaviour
 
 				newBuilding.Floors.Add(newFloor);
 				allGeneratedFloors.Add(newFloor);
+
+				// assign vertical neighbours
+				if(j > 0)
+				{
+					newFloor.nextFloors[(int)Dir.S] = newBuilding.Floors[newBuilding.Floors.Count - 2];
+					newBuilding.Floors[newBuilding.Floors.Count - 2].nextFloors[(int)Dir.N] = newFloor;
+				}
 			}
 
+			// assign horizontal neighbours
+			if(i > 0)
+			{
+				newBuilding.GetGroundFloor().nextFloors[(int)Dir.W] = CurrentLevel.Buildings[CurrentLevel.Buildings.Count - 2].GetGroundFloor();
+				CurrentLevel.Buildings[CurrentLevel.Buildings.Count - 2].GetGroundFloor().nextFloors[(int)Dir.E] = newBuilding.GetGroundFloor();
+			}
+			
 			// add roof on top of the building
 			GameObject newRoof = Instantiate(RoofPrefab);
 			newRoof.transform.SetParent(newBuilding.transform);
@@ -155,6 +173,9 @@ public class GameController : MonoBehaviour
 
 			allGeneratedFloors.RemoveAt(selectedFloorIndex);
 		}
+
+		CurrentBuildingIndex = 0;
+		CurrentFloorIndex = 0;
 	}
 
 	void ClearLevel()
