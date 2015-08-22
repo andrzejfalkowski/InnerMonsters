@@ -18,6 +18,15 @@ public class Building : MonoBehaviour
 {
 	public EFacadeType FacadeType;
 	public EFrameType FrameType;
+	
+	public static List<Color> PatternColors = new List<Color>()
+	{
+		Color.red,
+		Color.yellow,
+		Color.blue,
+		Color.green
+	};
+	public Color PatternColor;
 
 	public List<Floor> Floors;
 	// in case of basements, building starts underground
@@ -40,6 +49,8 @@ public class Building : MonoBehaviour
 
 		System.Array frameValues = System.Enum.GetValues (typeof(EFrameType));
 		FrameType = (EFrameType)facadeValues.GetValue (UnityEngine.Random.Range (0, frameValues.Length));
+
+		PatternColor = PatternColors[UnityEngine.Random.Range (0, PatternColors.Count)];
 	}
 
 	public Floor GetGroundFloor()
