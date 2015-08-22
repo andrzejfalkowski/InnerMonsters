@@ -24,7 +24,7 @@ public class PickableObject : MonoBehaviour
 	public EPickableObjectType Type;
 
 	// list of thought/object interactions
-	public List<Interaction> Interactions = 
+	public static List<Interaction> Interactions = 
 		new List<Interaction>()
 	{
 		new Interaction(EThoughtType.Water, EPickableObjectType.Vodka),
@@ -44,7 +44,7 @@ public class PickableObject : MonoBehaviour
 
 	// some objects can be used only on specific characters
 	// if exclusion is not specified, then assume we can use it on any character
-	public Dictionary<EPickableObjectType, List<ECharacterType>> ObjectCharacterExclusions = 
+	public static Dictionary<EPickableObjectType, List<ECharacterType>> ObjectCharacterExclusions = 
 		new Dictionary<EPickableObjectType, List<ECharacterType>>()
 	{
 		{ EPickableObjectType.Cat, new List<ECharacterType>(){ ECharacterType.Dog } },

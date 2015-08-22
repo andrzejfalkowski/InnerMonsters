@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public enum EThoughtType
 {
@@ -35,4 +36,18 @@ public class PersonOfInterest : MonoBehaviour
 	{
 		// TODO: handling people getting drunk, etc.
 	}
+
+	public List<EPickableObjectType> GetListOfCorrespondingPickables()
+	{
+		List<EPickableObjectType> list = new List<EPickableObjectType>();
+		foreach(Interaction interaction in PickableObject.Interactions)
+		{
+			if(interaction.ThoughtType == ThoughtType)
+			{
+				list.Add(interaction.PickableObject);
+			}
+		}
+		return list;
+	}
+	
 }
