@@ -43,13 +43,18 @@ public class GameController : MonoBehaviour
 	{
 		get{ return CurrentBuilding.Floors[CurrentFloorIndex]; }
 	}
-	
+
+	void Awake()
+	{
+		GenerateLevel ();
+		
+		CameraManager.currentFloor = CurrentFloor;
+	}
+
 	// Use this for initialization
 	void Start () 
 	{
-		GenerateLevel ();
 
-		CameraManager.currentFloor = CurrentFloor;
 	}
 	
 	// Update is called once per frame
@@ -175,7 +180,7 @@ public class GameController : MonoBehaviour
 		}
 
 		CurrentBuildingIndex = 0;
-		CurrentFloorIndex = 0;
+		CurrentFloorIndex = 0 - CurrentBuilding.BaseLevel;
 	}
 
 	void ClearLevel()
