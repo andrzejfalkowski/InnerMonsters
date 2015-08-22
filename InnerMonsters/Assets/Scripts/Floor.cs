@@ -19,6 +19,7 @@ public class Floor : MonoBehaviour
 	public EBackgroundType BackgroundType;
 
 	public SpriteRenderer BackgroundSpriteRenderer;
+	public SpriteRenderer BackgroundFrameSpriteRenderer;
 	public SpriteRenderer ForegroundSpriteRenderer;
 
 	public PersonOfInterest Person;
@@ -38,6 +39,7 @@ public class Floor : MonoBehaviour
 	}
 
 	public List<Sprite> BackgroundSprites;
+	public List<Sprite> BackgroundFrameSprites;
 
 	public List<Sprite> ForegroundSprites;
 	public List<Sprite> ForegroundBottomSprites;
@@ -54,7 +56,7 @@ public class Floor : MonoBehaviour
 	
 	}
 
-	public void Init(EFacadeType facadeType, bool isTopFloor, bool isBottomFloor, bool isBasement)
+	public void Init(EFacadeType facadeType, EFrameType frameType, bool isTopFloor, bool isBottomFloor, bool isBasement)
 	{
 		System.Array backgroundValues = System.Enum.GetValues(typeof(EBackgroundType));
 		BackgroundType = (EBackgroundType)backgroundValues.GetValue(UnityEngine.Random.Range(0, backgroundValues.Length));
@@ -78,5 +80,7 @@ public class Floor : MonoBehaviour
 		{
 			ForegroundSpriteRenderer.sprite = ForegroundSprites[(int)facadeType];
 		}
+
+		BackgroundFrameSpriteRenderer.sprite = BackgroundFrameSprites [(int)frameType];
 	}
 }

@@ -98,7 +98,7 @@ public class GameController : MonoBehaviour
 				GameObject newFloorObject = Instantiate(FloorPrefab);
 				Floor newFloor = newFloorObject.GetComponent<Floor>();
 
-				newFloor.Init(newBuilding.FacadeType, j == buildingHeight - 1, j + newBuilding.BaseLevel == 0, j + newBuilding.BaseLevel < 0);
+				newFloor.Init(newBuilding.FacadeType, newBuilding.FrameType, j == buildingHeight - 1, j + newBuilding.BaseLevel == 0, j + newBuilding.BaseLevel < 0);
 				
 				newFloor.transform.SetParent(newBuilding.transform);
 				Vector3 floorPos = Vector3.zero;
@@ -128,9 +128,10 @@ public class GameController : MonoBehaviour
 			GameObject newRoof = Instantiate(RoofPrefab);
 			newRoof.transform.SetParent(newBuilding.transform);
 			Vector3 roofPos = Vector3.zero;
-			roofPos.y = FLOOR_HEIGHT * (newBuilding.BaseLevel + buildingHeight);
+			roofPos.y = FLOOR_HEIGHT * (newBuilding.BaseLevel + buildingHeight) - 0.15f;
 			newRoof.transform.localPosition = roofPos;
-			newRoof.transform.localScale = Vector3.one;				
+			newRoof.transform.localScale = Vector3.one;	
+			newRoof.GetComponent<Roof>().Init();
 		}
 
 		// now distribute POIs and pickable objects

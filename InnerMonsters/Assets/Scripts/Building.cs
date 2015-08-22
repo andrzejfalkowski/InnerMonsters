@@ -8,9 +8,16 @@ public enum EFacadeType
 	red
 }
 
+public enum EFrameType
+{
+	frame_a,
+	frame_b
+}
+
 public class Building : MonoBehaviour 
 {
 	public EFacadeType FacadeType;
+	public EFrameType FrameType;
 
 	public List<Floor> Floors;
 	// in case of basements, building starts underground
@@ -30,6 +37,9 @@ public class Building : MonoBehaviour
 	{
 		System.Array facadeValues = System.Enum.GetValues (typeof(EFacadeType));
 		FacadeType = (EFacadeType)facadeValues.GetValue (UnityEngine.Random.Range (0, facadeValues.Length));
+
+		System.Array frameValues = System.Enum.GetValues (typeof(EFrameType));
+		FrameType = (EFrameType)facadeValues.GetValue (UnityEngine.Random.Range (0, frameValues.Length));
 	}
 
 	public Floor GetGroundFloor()
