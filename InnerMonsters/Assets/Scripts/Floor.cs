@@ -107,10 +107,17 @@ public class Floor : MonoBehaviour
 
 	void StopFade( float alpha )
 	{
+		UpdateForegroundAlpha( alpha );
+		fade = Fade.NONE;
+	}
+
+	void UpdateForegroundAlpha( float alpha )
+	{
 		Color newColor = ForegroundSpriteRenderer.color;
 		newColor.a = alpha;
+
 		ForegroundSpriteRenderer.color = newColor;
-		fade = Fade.NONE;
+		ForegroundPatternSpriteRenderer.color = newColor;
 	}
 
 	void FixedUpdate()
@@ -119,11 +126,10 @@ public class Floor : MonoBehaviour
 		{
 			case Fade.IN:
 			{
-				Color newColor = ForegroundSpriteRenderer.color;
-				newColor.a += FADE_SPEED;
+				float newAlpha = ForegroundSpriteRenderer.color.a + FADE_SPEED;
 
-				if( newColor.a < 1.0f ) 
-					ForegroundSpriteRenderer.color = newColor;
+				if( newAlpha < 1.0f ) 
+					UpdateForegroundAlpha( newAlpha );
 				else
 					StopFade( 1.0f );
 
@@ -132,11 +138,11 @@ public class Floor : MonoBehaviour
 
 			case Fade.OUT:
 			{
-				Color newColor = ForegroundSpriteRenderer.color;
-				newColor.a -= FADE_SPEED * 2.0f;	// Fade out at double velocity than Fade in
+				// Fade out at double velocity than Fade in
+				float newAlpha = ForegroundSpriteRenderer.color.a - ( FADE_SPEED * 2.0f );
 
-				if( newColor.a > 0.0f ) 
-					ForegroundSpriteRenderer.color = newColor;
+				if( newAlpha > 0.0f ) 
+					UpdateForegroundAlpha( newAlpha );
 				else
 					StopFade( 0.0f );
 
