@@ -74,5 +74,16 @@ public class CameraMgr : MonoBehaviour
 				transform.position = Vector3.Lerp( startPosition, targetPosition, percentageCovered );
 			}
 		}
+		else
+		{
+			if (Input.GetKey ("right"))
+				GoTo (Dir.E);
+			else if (Input.GetKey ("left"))
+				GoTo (Dir.W);
+			else if (Input.GetKey ("up"))
+				GoTo (Dir.N);
+			else if (Input.GetKey ("down"))
+				GoTo (Dir.S);
+		}
 	}
 }
