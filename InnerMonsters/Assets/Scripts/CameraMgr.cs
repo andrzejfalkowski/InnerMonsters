@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Assertions;
 using System.Collections;
 
 public class CameraMgr : MonoBehaviour 
@@ -19,8 +18,8 @@ public class CameraMgr : MonoBehaviour
 
 	void Start()
 	{
-		Assert.IsNotNull<Floor>( currentFloor );
 		UpdateArrows();
+		currentFloor.Reveal( true );
 	}
 
 	public void GoTo( int dir )
@@ -33,6 +32,8 @@ public class CameraMgr : MonoBehaviour
 		startTravelling = Time.time;
 		travelDistance = currentFloor.GetDistanceToFloor( dir );
 		startPosition = transform.position;
+
+		currentFloor.Reveal( false );
 		currentFloor = currentFloor.nextFloors[ (int)dir ];
 		travelling = true;
 
@@ -45,6 +46,7 @@ public class CameraMgr : MonoBehaviour
 		arrows[ (int)Dir.E ].gameObject.SetActive( currentFloor.nextFloors[ (int)Dir.E ] != null );
 		arrows[ (int)Dir.S ].gameObject.SetActive( currentFloor.nextFloors[ (int)Dir.S ] != null );
 		arrows[ (int)Dir.W ].gameObject.SetActive( currentFloor.nextFloors[ (int)Dir.W ] != null );
+		currentFloor.Reveal( true );
 	}
 
 	// Update is called once per frame
@@ -60,6 +62,7 @@ public class CameraMgr : MonoBehaviour
 				transform.position = targetPosition;
 				travelling = false;
 				UpdateArrows();
+				currentFloor.Reveal( true );
 			}
 			else
 			{

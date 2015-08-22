@@ -26,6 +26,8 @@ public class Floor : MonoBehaviour
 	public PickableObject Pickable;
 	public Floor[] nextFloors = new Floor[4];
 
+	private const float FADE_SPEED = 0.2f;
+
 	public float GetDistanceToFloor( Dir dir )
 	{
 		switch( dir )
@@ -47,14 +49,14 @@ public class Floor : MonoBehaviour
 	public List<Sprite> ForegroundBasementSprites;
 
 	// Use this for initialization
-	void Start () {
-	
-	}
+//	void Start () {
+//	
+//	}
 	
 	// Update is called once per frame
-	void Update () {
-	
-	}
+//	void Update () {
+//	
+//	}
 
 	public void Init(EFacadeType facadeType, EFrameType frameType, bool isTopFloor, bool isBottomFloor, bool isBasement)
 	{
@@ -82,5 +84,32 @@ public class Floor : MonoBehaviour
 		}
 
 		BackgroundFrameSpriteRenderer.sprite = BackgroundFrameSprites [(int)frameType];
+	}
+
+	public void Reveal( bool reveal )
+	{
+		StartCoroutine( reveal ? FadeOut() : FadeIn() );
+	}
+
+	IEnumerator FadeIn() 
+	{
+		while( ForegroundSpriteRenderer.color.a < 1.0f ) 
+		{
+			Color newColor = ForegroundSpriteRenderer.color;
+			newColor.a += FADE_SPEED;
+			ForegroundSpriteRenderer.color = newColor;
+			yield return new WaitForSeconds( 0.1f ); // Random.Range(5, 10) );
+		}
+	}
+
+	IEnumerator FadeOut() 
+	{
+		while( ForegroundSpriteRenderer.color.a > 0.0f ) 
+		{
+			Color newColor = ForegroundSpriteRenderer.color;
+			newColor.a -= FADE_SPEED * 2.0f;
+			ForegroundSpriteRenderer.color = newColor;
+			yield return new WaitForSeconds( 0.1f ); // Random.Range(5, 10) );
+		}
 	}
 }
