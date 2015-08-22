@@ -30,6 +30,14 @@ public class CameraMgr : MonoBehaviour
 
 	public void GoTo( Dir dir )
 	{
+		switch( dir )
+		{
+			case Dir.N: if(currentFloor.nextFloors[ (int)Dir.N ] == null) return; break;
+			case Dir.E: if(currentFloor.nextFloors[ (int)Dir.E ] == null) return; break;
+			case Dir.S: if(currentFloor.nextFloors[ (int)Dir.S ] == null) return; break;
+			case Dir.W: if(currentFloor.nextFloors[ (int)Dir.W ] == null) return; break;
+		}
+		
 		startTravelling = Time.time;
 		travelDistance = currentFloor.GetDistanceToFloor( dir );
 		startPosition = transform.position;
