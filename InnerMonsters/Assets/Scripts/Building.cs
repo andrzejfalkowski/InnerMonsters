@@ -14,19 +14,21 @@ public enum EFrameType
 	frame_b
 }
 
+public enum EPatternColor
+{
+	green,
+	yellow,
+	blue,
+	red
+}
+
 public class Building : MonoBehaviour 
 {
 	public EFacadeType FacadeType;
 	public EFrameType FrameType;
 	
-	public static List<Color> PatternColors = new List<Color>()
-	{
-		new Color32(30, 164, 201, 255),
-		new Color32(198, 77, 30, 255),
-		new Color32(198, 133, 30, 255),
-		new Color32(145, 177, 52, 255)
-	};
-	public Color PatternColor;
+
+	public EPatternColor PatternColor;
 
 	public List<Floor> Floors;
 	// in case of basements, building starts underground
@@ -44,13 +46,14 @@ public class Building : MonoBehaviour
 	
 	public void Init()
 	{
-		System.Array facadeValues = System.Enum.GetValues (typeof(EFacadeType));
-		FacadeType = (EFacadeType)facadeValues.GetValue (UnityEngine.Random.Range (0, facadeValues.Length));
+//		System.Array facadeValues = System.Enum.GetValues (typeof(EFacadeType));
+//		FacadeType = (EFacadeType)facadeValues.GetValue (UnityEngine.Random.Range (0, facadeValues.Length));
 
-		System.Array frameValues = System.Enum.GetValues (typeof(EFrameType));
-		FrameType = (EFrameType)facadeValues.GetValue (UnityEngine.Random.Range (0, frameValues.Length));
+//		System.Array frameValues = System.Enum.GetValues (typeof(EFrameType));
+//		FrameType = (EFrameType)facadeValues.GetValue (UnityEngine.Random.Range (0, frameValues.Length));
 
-		PatternColor = PatternColors[UnityEngine.Random.Range (0, PatternColors.Count)];
+		System.Array patternColorValues = System.Enum.GetValues (typeof(EPatternColor));
+		PatternColor = (EPatternColor)patternColorValues.GetValue (UnityEngine.Random.Range (0, patternColorValues.Length));
 	}
 
 	public Floor GetGroundFloor()
