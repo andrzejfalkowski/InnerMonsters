@@ -27,6 +27,9 @@ public class PickableObject : MonoBehaviour
 	
 	public bool IsContraryForThought(Thought thought)
 	{
+		if(thought == null)
+		   return false;
+
 		foreach(PickableObject pickable in thought.ContraryObjects)
 		{
 			if(pickable.Type == Type)
