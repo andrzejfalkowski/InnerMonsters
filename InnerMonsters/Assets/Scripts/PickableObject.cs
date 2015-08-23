@@ -8,15 +8,17 @@ public enum EPickableObjectType
 	Whisky,
 	DemonPainting,
 	Pentagram,
-	Cat,
-	VacuumCleaner,
-	Dog,
-	Mouse,
-	Burglar,
-	Police,
-	Bug,
-	Cocaine,
-	Fire
+	Crowbar,
+	BurglarMask,
+	Matches,
+	Gamepad,
+	Burger,
+	Steak,
+	Cigarettes,
+	Poker,
+	Cocainum,
+	Razor,
+	CarKeys
 }
 
 public class PickableObject : MonoBehaviour 
