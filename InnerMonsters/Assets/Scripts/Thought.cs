@@ -24,6 +24,8 @@ public class Thought : MonoBehaviour
 	public List<PickableObject> ContraryObjects;
 	public List<string> TraumaSpeeches;
 
+	public Sprite Symbol;
+
 	public bool CanBeAppliedToCharacter(PersonOfInterest person)
 	{
 		if(SpecificCharactersOnly.Count == 0)

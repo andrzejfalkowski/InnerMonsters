@@ -74,7 +74,7 @@ public class GameController : MonoBehaviour
 	
 	void Awake()
 	{
-		MainCamera.orthographicSize = 3.0f;
+		MainCamera.orthographicSize = 2.5f;
 		StartNewGame();
 	}
 
@@ -216,11 +216,6 @@ public class GameController : MonoBehaviour
 			person.transform.localPosition = Vector3.zero;
 			person.transform.localScale = Vector3.one;
 
-			allGeneratedFloors.RemoveAt(selectedFloorIndex);
-
-			if(allGeneratedFloors.Count <= 0)
-				return;
-
 			// then select his thoughts
 			List<Thought> ApplicableThoughts = new List<Thought>();
 			foreach(Thought t in ThoughtsPrefabs)
@@ -230,6 +225,11 @@ public class GameController : MonoBehaviour
 			}
 			Thought thought = Instantiate(ApplicableThoughts[UnityEngine.Random.Range(0, ApplicableThoughts.Count)]);
 			person.CurrentThought = thought;
+
+			allGeneratedFloors.RemoveAt(selectedFloorIndex);
+			
+			if(allGeneratedFloors.Count <= 0)
+				return;
 
 			// then corresponding pickable object
 			PickableObject pickable = Instantiate(person.CurrentThought.ContraryObjects[UnityEngine.Random.Range(0, person.CurrentThought.ContraryObjects.Count)]);

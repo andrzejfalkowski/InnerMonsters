@@ -103,6 +103,14 @@ public class Floor : MonoBehaviour
 	public void Reveal( bool reveal )
 	{
 		fade = ( reveal ? Fade.OUT : Fade.IN );
+
+		if(Person != null)
+		{
+			if(reveal)
+				Person.Show();
+			else
+				Person.Hide();
+		}
 	}
 
 	void StopFade( float alpha )
