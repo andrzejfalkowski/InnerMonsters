@@ -8,7 +8,8 @@ public enum EGameState
 {
 	Preparation,
 	GamePlay,
-	GameOver
+	GameOver,
+	Transition
 }
 
 public class GameController : MonoBehaviour 
@@ -17,6 +18,7 @@ public class GameController : MonoBehaviour
 	public Camera MainCamera;
 
 	public MusicController Music;
+	public TransitionController Transition;
 
 	public GameObject MainMenuPanel;
 	public GameObject InGamePanel;
@@ -114,9 +116,15 @@ public class GameController : MonoBehaviour
 		{
 			if(Input.GetKey("space"))
 			{
-				MainMenuPanel.SetActive(false);
-				InGamePanel.SetActive(true);
-				StartNewGame();
+				CurrentGameState = EGameState.Transition;
+				Transition.StartFade(
+					()=>{
+						MainMenuPanel.SetActive(false);
+						InGamePanel.SetActive(true);
+						StartNewGame();
+					},
+					null
+				);
 			}
 		}
 
@@ -170,7 +178,13 @@ public class GameController : MonoBehaviour
 		{
 			if(Input.GetKey("space"))
 			{
-				StartNewGame();
+				CurrentGameState = EGameState.Transition;
+				Transition.StartFade(
+					()=>{
+						StartNewGame();
+					},
+					null
+				);
 			}
 		}
 	}
