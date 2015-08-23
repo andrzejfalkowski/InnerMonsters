@@ -39,9 +39,4 @@ public class PickableObject : MonoBehaviour
 	{
 		return IsContraryForThought(person.CurrentThought);
 	}
-	
-	public void PickUpObject()
-	{
-		// TODO
-	}
 }
