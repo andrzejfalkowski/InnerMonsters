@@ -16,6 +16,9 @@ public class GameController : MonoBehaviour
 	public CameraMgr CameraManager;
 	public Camera MainCamera;
 
+	public GameObject MainMenuPanel;
+	public GameObject InGamePanel;
+
 	public Image currentItem = null;
 	public Image timer = null;
 
@@ -33,7 +36,7 @@ public class GameController : MonoBehaviour
 	public List<PersonOfInterest> PeopleOfInterestPrefabs;
 	public List<Thought> ThoughtsPrefabs;
 
-	[System.NonSerialized]
+	//[System.NonSerialized]
 	public PickableObject CurrentlyPickedUpObject;
 
 	const float FLOOR_HEIGHT = 1.6f;
@@ -74,8 +77,11 @@ public class GameController : MonoBehaviour
 	
 	void Awake()
 	{
+		CameraManager.enabled = false;
+		InGamePanel.SetActive(false);
+		MainMenuPanel.SetActive(true);
+
 		MainCamera.orthographicSize = 2.5f;
-		StartNewGame();
 	}
 
 	// Use this for initialization
@@ -87,6 +93,16 @@ public class GameController : MonoBehaviour
 	// Update is called once per frame
 	void Update() 
 	{
+		if(CurrentGameState == EGameState.Preparation)
+		{
+			if(Input.GetKey("space"))
+			{
+				MainMenuPanel.SetActive(false);
+				InGamePanel.SetActive(true);
+				StartNewGame();
+			}
+		}
+
 		if(CurrentGameState == EGameState.GamePlay)
 		{
 			if(TimeLeft < 0f)
