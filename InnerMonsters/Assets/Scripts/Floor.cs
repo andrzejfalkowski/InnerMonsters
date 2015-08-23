@@ -31,6 +31,8 @@ public class Floor : MonoBehaviour
 	private Fade fade = Fade.NONE;
 	private const float FADE_SPEED = 0.05f;
 
+	public bool Deactivated = false;
+
 	public float GetDistanceToFloor( Dir dir )
 	{
 		switch( dir )
@@ -42,7 +44,6 @@ public class Floor : MonoBehaviour
 		}
 		return 0.0f;
 	}
-
 	public List<Sprite> BackgroundSprites;
 	public List<Sprite> BackgroundFrameSprites;
 
@@ -52,6 +53,9 @@ public class Floor : MonoBehaviour
 	public List<Sprite> ForegroundBasementSprites;
 	public List<Sprite> ForegroundPatternSprites;
 
+	bool isTopFloor;
+	bool isBottomFloor;
+	bool isBasement;
 	// Use this for initialization
 //	void Start () {
 //	
@@ -62,8 +66,12 @@ public class Floor : MonoBehaviour
 //	
 //	}
 
-	public void Init(EFacadeType facadeType, EFrameType frameType, Color patternColor, bool isTopFloor, bool isBottomFloor, bool isBasement)
+	public void Init(EPatternColor patternColor, bool _isTopFloor, bool _isBottomFloor, bool _isBasement)
 	{
+		isTopFloor = _isTopFloor;
+		isBottomFloor = _isBottomFloor;
+		isBasement = _isBasement;
+
 		System.Array backgroundValues = System.Enum.GetValues(typeof(EBackgroundType));
 		BackgroundType = (EBackgroundType)backgroundValues.GetValue(UnityEngine.Random.Range(0, backgroundValues.Length));
 
@@ -72,22 +80,22 @@ public class Floor : MonoBehaviour
 
 		if(isTopFloor)
 		{
-			ForegroundSpriteRenderer.sprite = ForegroundTopSprites[(int)facadeType];
+			ForegroundSpriteRenderer.sprite = ForegroundTopSprites[0];
 		}
 		else if(isBottomFloor)
 		{
-			ForegroundSpriteRenderer.sprite = ForegroundBottomSprites[(int)facadeType];
+			ForegroundSpriteRenderer.sprite = ForegroundBottomSprites[0];
 		}
 		else if(isBasement)
 		{
-			ForegroundSpriteRenderer.sprite = ForegroundBasementSprites[(int)facadeType];
+			ForegroundSpriteRenderer.sprite = ForegroundBasementSprites[0];
 		}
 		else 
 		{
-			ForegroundSpriteRenderer.sprite = ForegroundSprites[(int)facadeType];
+			ForegroundSpriteRenderer.sprite = ForegroundSprites[0];
 		}
 
-		BackgroundFrameSpriteRenderer.sprite = BackgroundFrameSprites [(int)frameType];
+		BackgroundFrameSpriteRenderer.sprite = BackgroundFrameSprites [0];
 
 		if (isBasement)
 		{
@@ -95,13 +103,16 @@ public class Floor : MonoBehaviour
 		}
 		else
 		{
-			ForegroundPatternSpriteRenderer.sprite = ForegroundPatternSprites[UnityEngine.Random.Range (0, ForegroundPatternSprites.Count)];
-			ForegroundPatternSpriteRenderer.color = patternColor;
+			int variant = UnityEngine.Random.Range(0, 2);
+			ForegroundPatternSpriteRenderer.sprite = ForegroundPatternSprites[((int)patternColor * 3) + variant];
 		}
 	}
 
 	public void Reveal( bool reveal )
 	{
+		if (Deactivated && reveal)
+			return;
+
 		fade = ( reveal ? Fade.OUT : Fade.IN );
 
 		if(Person != null)
@@ -130,6 +141,26 @@ public class Floor : MonoBehaviour
 		newColor.a = alpha;
 
 		ForegroundPatternSpriteRenderer.color = newColor;
+	}
+
+	public void Deactivate()
+	{
+		Deactivated = true;
+
+		if(isTopFloor)
+		{
+			ForegroundSpriteRenderer.sprite = ForegroundTopSprites[1];
+		}
+		else if(isBottomFloor)
+		{
+			ForegroundSpriteRenderer.sprite = ForegroundBottomSprites[1];
+		}
+		else if(!isBasement)
+		{
+			ForegroundSpriteRenderer.sprite = ForegroundSprites[1];
+		}
+
+		Reveal(false);
 	}
 
 	void FixedUpdate()

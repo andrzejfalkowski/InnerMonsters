@@ -165,7 +165,7 @@ public class GameController : MonoBehaviour
 				GameObject newFloorObject = Instantiate(FloorPrefab);
 				Floor newFloor = newFloorObject.GetComponent<Floor>();
 
-				newFloor.Init(newBuilding.FacadeType, newBuilding.FrameType, newBuilding.PatternColor, j == buildingHeight - 1, j + newBuilding.BaseLevel == 0, j + newBuilding.BaseLevel < 0);
+				newFloor.Init(newBuilding.PatternColor, j == buildingHeight - 1, j + newBuilding.BaseLevel == 0, j + newBuilding.BaseLevel < 0);
 				
 				newFloor.transform.SetParent(newBuilding.transform);
 				Vector3 floorPos = Vector3.zero;
@@ -338,6 +338,7 @@ public class GameController : MonoBehaviour
 			if(CurrentlyPickedUpObject.CanBeUsedOn(CurrentFloor.Person))
 			{
 				CurrentFloor.Person.UseObjectOn(CurrentlyPickedUpObject);
+				CurrentFloor.Deactivate();
 
 				RemoveObjectOfHand();
 
