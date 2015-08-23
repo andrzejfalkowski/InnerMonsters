@@ -215,7 +215,13 @@ public class GameController : MonoBehaviour
 				return;
 
 			// then select his thoughts
-			Thought thought = Instantiate(ThoughtsPrefabs[UnityEngine.Random.Range(0, ThoughtsPrefabs.Count)]);
+			List<Thought> ApplicableThoughts = new List<Thought>();
+			foreach(Thought t in ThoughtsPrefabs)
+			{
+				if(t.CanBeAppliedToCharacter(person))
+					ApplicableThoughts.Add(t);
+			}
+			Thought thought = Instantiate(ApplicableThoughts[UnityEngine.Random.Range(0, ApplicableThoughts.Count)]);
 			person.CurrentThought = thought;
 
 			// then corresponding pickable object
@@ -321,7 +327,9 @@ public class GameController : MonoBehaviour
 			{
 				CurrentFloor.Person.UseObjectOn(CurrentlyPickedUpObject);
 
-				TimeLeft += TIME_LEFT;
+				RemoveObjectOfHand();
+
+				TimeLeft += TIME_REWARD;
 				Score++;
 			}
 		}
