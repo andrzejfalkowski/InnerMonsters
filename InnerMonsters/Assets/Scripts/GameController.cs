@@ -201,6 +201,9 @@ public class GameController : MonoBehaviour
 			newRoof.GetComponent<Roof>().Init();
 		}
 
+		// don't have any items on ground floor of the first building
+		allGeneratedFloors.RemoveAt (0 - CurrentLevel.Buildings[0].BaseLevel);
+
 		// now distribute POIs and pickable objects
 		int availableFloorsAmount = allGeneratedFloors.Count;
 		for(int i = 0; i < availableFloorsAmount; i += 2)
