@@ -59,6 +59,7 @@ public class GameController : MonoBehaviour
 
 	public UnityEngine.UI.Text Timer;
 	public UnityEngine.UI.Text GameOverText;
+	public Image gameOverPanel = null;
 
 	public EGameState CurrentGameState;
 
@@ -93,6 +94,7 @@ public class GameController : MonoBehaviour
 				TimeLeft = 0f;
 
 				GameOverText.gameObject.SetActive(true);
+				gameOverPanel.gameObject.SetActive( true );
 				GameOverText.text = "GAME OVER\nPathetic lives ruined: " + Score.ToString() +  "\nTime wasted: " + ((int)TimePlayed).ToString() + "s\nPress space to try again";
 
 				CurrentGameState = EGameState.GameOver;
@@ -252,6 +254,7 @@ public class GameController : MonoBehaviour
 		CurrentGameState = EGameState.GamePlay;
 
 		GameOverText.gameObject.SetActive(false);
+		gameOverPanel.gameObject.SetActive( false );
 	}
 
 	void ClearLevel()
