@@ -18,6 +18,7 @@ public class CameraMgr : MonoBehaviour
 	private const float TRAVEL_TIME = 3.0f;
 	private const float HORIZONTAL_VELOCITY_MULTIPLIER = 2.0f;
 	private const float VERTICAL_VELOCITY_MULTIPLIER = 0.8f;
+	private const float Y_SHIFT = 1.0f;
 
 	void Start()
 	{
@@ -52,7 +53,7 @@ public class CameraMgr : MonoBehaviour
 
 		travelling = true;
 
-		targetPosition = new Vector3(currentFloor.transform.position.x, currentFloor.transform.position.y, startPosition.z);
+		targetPosition = new Vector3(currentFloor.transform.position.x, currentFloor.transform.position.y + Y_SHIFT, startPosition.z);
 		travellingDirection = dir;
 	}
 

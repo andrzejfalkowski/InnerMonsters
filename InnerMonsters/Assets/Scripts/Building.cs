@@ -21,10 +21,10 @@ public class Building : MonoBehaviour
 	
 	public static List<Color> PatternColors = new List<Color>()
 	{
-		Color.red,
-		Color.yellow,
-		Color.blue,
-		Color.green
+		new Color32(30, 164, 201, 255),
+		new Color32(198, 77, 30, 255),
+		new Color32(198, 133, 30, 255),
+		new Color32(145, 177, 52, 255)
 	};
 	public Color PatternColor;
 
