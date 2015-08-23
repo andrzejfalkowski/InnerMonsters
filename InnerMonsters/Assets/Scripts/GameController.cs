@@ -26,6 +26,7 @@ public class GameController : MonoBehaviour
 	public GameObject RoofPrefab;
 
 	public List<PersonOfInterest> PeopleOfInterestPrefabs;
+	public List<Thought> ThoughtsPrefabs;
 	public List<PickableObject> PickableObjectsPrefabs;
 
 	[System.NonSerialized]
@@ -188,13 +189,12 @@ public class GameController : MonoBehaviour
 
 		// now distribute POIs and pickable objects
 		int availableFloorsAmount = allGeneratedFloors.Count;
-		int peopleOfInterestAmount = PeopleOfInterestPrefabs.Count;
-		int pickableObjectsAmount = 0;
 		for(int i = 0; i < availableFloorsAmount; i += 2)
 		{
 			// first person
-			PersonOfInterest person = Instantiate(PeopleOfInterestPrefabs[UnityEngine.Random.Range(0, peopleOfInterestAmount)]);
-
+			PersonOfInterest person = Instantiate(PeopleOfInterestPrefabs[UnityEngine.Random.Range(0, PeopleOfInterestPrefabs.Count)]);
+			person.Init();
+			
 			int selectedFloorIndex = UnityEngine.Random.Range(0, allGeneratedFloors.Count);
 			allGeneratedFloors[selectedFloorIndex].Person = person;
 
@@ -207,20 +207,12 @@ public class GameController : MonoBehaviour
 			if(allGeneratedFloors.Count <= 0)
 				return;
 
-			// then corresponding pickable object
-			List<EPickableObjectType> applicablePickables = person.GetListOfCorrespondingPickables();
-			List<PickableObject> applicablePickablePrefabs = new List<PickableObject>();
-			foreach(EPickableObjectType pickableType in applicablePickables)
-			{
-				foreach(PickableObject pickablePrefab in PickableObjectsPrefabs)
-				{
-					if(pickableType == pickablePrefab.Type)
-						applicablePickablePrefabs.Add(pickablePrefab);
-				}
-			}
-			pickableObjectsAmount = applicablePickablePrefabs.Count;
+			// then select his thoughts
+			Thought thought = Instantiate(ThoughtsPrefabs[UnityEngine.Random.Range(0, ThoughtsPrefabs.Count)]);
+			person.CurrentThought = thought;
 
-			PickableObject pickable = Instantiate(PickableObjectsPrefabs[UnityEngine.Random.Range(0, pickableObjectsAmount)]);
+			// then corresponding pickable object
+			PickableObject pickable = Instantiate(person.CurrentThought.ContraryObjects[UnityEngine.Random.Range(0, person.CurrentThought.ContraryObjects.Count)]);
 
 			selectedFloorIndex = UnityEngine.Random.Range(0, allGeneratedFloors.Count);
 			allGeneratedFloors[selectedFloorIndex].Pickable = pickable;
