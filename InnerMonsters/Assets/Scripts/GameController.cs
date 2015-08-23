@@ -16,6 +16,8 @@ public class GameController : MonoBehaviour
 	public CameraMgr CameraManager;
 	public Camera MainCamera;
 
+	public MusicController Music;
+
 	public GameObject MainMenuPanel;
 	public GameObject InGamePanel;
 
@@ -66,6 +68,8 @@ public class GameController : MonoBehaviour
 
 	public float MAX_CLOCK_ANIMATION_SPEED = 3.0f;
 
+	public float TIME_LEFT_FAST_MUSIC_TRESHOLD = 10f;
+
 	public UnityEngine.UI.Text Timer;
 	public UnityEngine.UI.Text GameOverText;
 	public Image gameOverPanel = null;
@@ -88,6 +92,8 @@ public class GameController : MonoBehaviour
 		MainMenuPanel.SetActive(true);
 
 		MainCamera.orthographicSize = 2.5f;
+
+		Music.PlayMusic(EMusicType.TitleScreen);
 	}
 
 	// Use this for initialization
@@ -124,6 +130,8 @@ public class GameController : MonoBehaviour
 				CurrentFloor.Reveal( false );
 				timerContainer.SetActive( false );
 				timerAnimation.Stop();
+
+				Music.PlayMusic(EMusicType.GameOver);
 			}
 			else
 			{
@@ -134,6 +142,15 @@ public class GameController : MonoBehaviour
 				{
 					timerAnimation.Play();
 					timerAnimation["ClockBeat"].speed = MAX_CLOCK_ANIMATION_SPEED * (1 - (TimeLeft / animateClockWhenSecondsLeft) );
+				}
+
+				if(TimeLeft < TIME_LEFT_FAST_MUSIC_TRESHOLD)
+				{
+					Music.PlayMusic(EMusicType.FastGameplay);
+				}
+				else
+				{
+					Music.PlayMusic(EMusicType.Gameplay);
 				}
 			}
 //			Timer.text = "Time Left: " + ((int)TimeLeft).ToString() + "s";
@@ -158,6 +175,8 @@ public class GameController : MonoBehaviour
 		GenerateLevel();
 		
 		ResetPlayerState();
+
+		Music.PlayMusic(EMusicType.Gameplay);
 	}
 
 	void GenerateLevel()
