@@ -102,7 +102,8 @@ public class GameController : MonoBehaviour
 				TimeLeft -= Time.deltaTime;
 				TimePlayed += Time.deltaTime;
 			}
-			Timer.text = "Time Left: " + ((int)TimeLeft).ToString() + "s";
+//			Timer.text = "Time Left: " + ((int)TimeLeft).ToString() + "s";
+			Timer.text = ((int)TimeLeft).ToString();
 			timer.fillAmount = TimeLeft / TIME_LEFT;
 
 			if( Input.GetKeyUp("space") )
