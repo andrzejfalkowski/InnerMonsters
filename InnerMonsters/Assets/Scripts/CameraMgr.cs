@@ -57,6 +57,11 @@ public class CameraMgr : MonoBehaviour
 		travellingDirection = dir;
 	}
 
+	public void Snap( )
+	{
+		transform.position = new Vector3(currentFloor.transform.position.x, currentFloor.transform.position.y + Y_SHIFT, transform.position.z);
+	}
+
 	void UpdateArrows()
 	{
 		arrows[ (int)Dir.N ].gameObject.SetActive( currentFloor.nextFloors[ (int)Dir.N ] != null );

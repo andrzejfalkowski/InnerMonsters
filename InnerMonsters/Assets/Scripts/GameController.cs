@@ -240,6 +240,7 @@ public class GameController : MonoBehaviour
 		CurrentFloorIndex = 0 - CurrentBuilding.BaseLevel;
 
 		CameraManager.currentFloor = CurrentBuilding.Floors[CurrentFloorIndex];
+		CameraManager.Snap();
 
 		TimeLeft = TIME_LEFT;
 		TimePlayed = 0f;
