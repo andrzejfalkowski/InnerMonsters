@@ -98,6 +98,7 @@ public class GameController : MonoBehaviour
 				GameOverText.text = "GAME OVER\nPathetic lives ruined: " + Score.ToString() +  "\nTime wasted: " + ((int)TimePlayed).ToString() + "s\nPress space to try again";
 
 				CurrentGameState = EGameState.GameOver;
+				CameraManager.enabled = false;
 			}
 			else
 			{
@@ -252,6 +253,7 @@ public class GameController : MonoBehaviour
 		Score = 0;
 
 		CurrentGameState = EGameState.GamePlay;
+		CameraManager.enabled = true;
 
 		GameOverText.gameObject.SetActive(false);
 		gameOverPanel.gameObject.SetActive( false );
