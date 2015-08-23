@@ -8,6 +8,8 @@ public class CameraMgr : MonoBehaviour
 
 	public Button[] arrows = new Button[4];
 
+	public GameController MyGameController;
+
 	private float startTravelling = 0.0f;
 	private float travelDistance = 0.0f;
 	private Vector3 startPosition = Vector3.zero;
@@ -35,10 +37,30 @@ public class CameraMgr : MonoBehaviour
 	{
 		switch( dir )
 		{
-			case Dir.N: if(currentFloor.nextFloors[ (int)Dir.N ] == null) return; break;
-			case Dir.E: if(currentFloor.nextFloors[ (int)Dir.E ] == null) return; break;
-			case Dir.S: if(currentFloor.nextFloors[ (int)Dir.S ] == null) return; break;
-			case Dir.W: if(currentFloor.nextFloors[ (int)Dir.W ] == null) return; break;
+			case Dir.N: 
+				if(currentFloor.nextFloors[ (int)Dir.N ] == null) 
+					return;
+				else 
+					MyGameController.CurrentFloorIndex++;
+				break;
+			case Dir.E: 
+				if(currentFloor.nextFloors[ (int)Dir.E ] == null) 
+					return;
+				else 
+					MyGameController.CurrentBuildingIndex++;
+				break;
+			case Dir.S: 
+				if(currentFloor.nextFloors[ (int)Dir.S ] == null) 
+					return;
+				else 
+					MyGameController.CurrentFloorIndex--;
+				break;
+			case Dir.W: 
+				if(currentFloor.nextFloors[ (int)Dir.W ] == null) 
+					return;
+				else 
+					MyGameController.CurrentBuildingIndex--;
+				break;
 		}
 		
 		startTravelling = Time.time;

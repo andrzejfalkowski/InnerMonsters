@@ -31,6 +31,8 @@ public class GameController : MonoBehaviour
 	public int CurrentBuildingIndex = 0;
 	[System.NonSerialized]
 	public int CurrentFloorIndex = 0;
+	[System.NonSerialized]
+	public int MaxBuildingIndex = 0;
 	
 	public GameObject BuildingPrefab;
 	public GameObject FloorPrefab;
@@ -56,7 +58,7 @@ public class GameController : MonoBehaviour
 	const int BUILDING_MAX_HEIGHT = 4;
 
 	const float TIME_LEFT = 30f;
-	const float TIME_REWARD = 5f;
+	const float TIME_REWARD = 10f;
 
 	const float Z_BEHIND_BUILDING = 1f;
 
@@ -84,7 +86,10 @@ public class GameController : MonoBehaviour
 	{
 		get{ return CameraManager.currentFloor; }
 	}
-	
+
+	public int AmountOfMatchesLeft = 0;
+	const int MORE_BUILDINGS_TRESHOLD = 2;
+
 	void Awake()
 	{
 		CameraManager.enabled = false;
@@ -183,37 +188,44 @@ public class GameController : MonoBehaviour
 	{
 		ClearLevel();
 
+		MaxBuildingIndex = 0;
+
+		GenerateNewBuildings(BUILDING_MIN_AMOUNT, BUILDING_MAX_AMOUNT, true);
+	}
+
+	void GenerateNewBuildings(int minAmount, int maxAmount, bool isNewGame = false)
+	{
 		// first create building and floors
 		List<Floor> allGeneratedFloors = new List<Floor>();
-		int amountOfBuildings = UnityEngine.Random.Range (BUILDING_MIN_AMOUNT, BUILDING_MAX_AMOUNT);
+		int amountOfBuildings = UnityEngine.Random.Range (minAmount, maxAmount);
 		for(int i = 0; i < amountOfBuildings; i++)
 		{
 			GameObject newBuildingObject = Instantiate(BuildingPrefab);
 			Building newBuilding = newBuildingObject.GetComponent<Building>();
-
+			
 			newBuilding.transform.SetParent(LevelParent);
 			Vector3 buildingPos = Vector3.zero;
-			buildingPos.x = BUILDING_WIDTH * i;
+			buildingPos.x = BUILDING_WIDTH * (i + MaxBuildingIndex);
 			newBuilding.transform.localPosition = buildingPos;
 			newBuilding.transform.localScale = Vector3.one;
-
+			
 			int buildingHeight =  UnityEngine.Random.Range(BUILDING_MIN_HEIGHT, BUILDING_MAX_HEIGHT + 1);
 			newBuilding.BaseLevel = UnityEngine.Random.Range(BUILDING_MIN_BASE_LEVEL, BUILDING_MAX_BASE_LEVEL + 1);
-
+			
 			// make sure each building is at least above the ground, we don't want any bunkers
 			if(buildingHeight + newBuilding.BaseLevel < BUILDING_MIN_HEIGHT)
 				buildingHeight = BUILDING_MIN_HEIGHT - newBuilding.BaseLevel;
-
+			
 			// select facade
 			newBuilding.Init();
-
+			
 			CurrentLevel.Buildings.Add(newBuilding);
-
+			
 			for(int j = 0; j < buildingHeight; j++)
 			{
 				GameObject newFloorObject = Instantiate(FloorPrefab);
 				Floor newFloor = newFloorObject.GetComponent<Floor>();
-
+				
 				newFloor.Init(newBuilding.PatternColor, j == buildingHeight - 1, j + newBuilding.BaseLevel == 0, j + newBuilding.BaseLevel < 0);
 				
 				newFloor.transform.SetParent(newBuilding.transform);
@@ -221,10 +233,10 @@ public class GameController : MonoBehaviour
 				floorPos.y = FLOOR_HEIGHT * (newBuilding.BaseLevel + j);
 				newFloor.transform.localPosition = floorPos;
 				newFloor.transform.localScale = Vector3.one;	
-
+				
 				newBuilding.Floors.Add(newFloor);
 				allGeneratedFloors.Add(newFloor);
-
+				
 				// assign vertical neighbours
 				if(j > 0)
 				{
@@ -232,12 +244,18 @@ public class GameController : MonoBehaviour
 					newBuilding.Floors[newBuilding.Floors.Count - 2].nextFloors[(int)Dir.N] = newFloor;
 				}
 			}
-
+			
 			// assign horizontal neighbours
 			if(i > 0)
 			{
 				newBuilding.GetGroundFloor().nextFloors[(int)Dir.W] = CurrentLevel.Buildings[CurrentLevel.Buildings.Count - 2].GetGroundFloor();
 				CurrentLevel.Buildings[CurrentLevel.Buildings.Count - 2].GetGroundFloor().nextFloors[(int)Dir.E] = newBuilding.GetGroundFloor();
+			}
+			// bridge between generated segments
+			else if(!isNewGame)
+			{
+				newBuilding.GetGroundFloor().nextFloors[(int)Dir.W] = CurrentLevel.Buildings[MaxBuildingIndex - 1].GetGroundFloor();
+				CurrentLevel.Buildings[MaxBuildingIndex - 1].GetGroundFloor().nextFloors[(int)Dir.E] = newBuilding.GetGroundFloor();
 			}
 			
 			// add roof on top of the building
@@ -250,9 +268,13 @@ public class GameController : MonoBehaviour
 			newRoof.GetComponent<Roof>().Init();
 		}
 
-		// don't have any items on ground floor of the first building
-		allGeneratedFloors.RemoveAt (0 - CurrentLevel.Buildings[0].BaseLevel);
+		// we'll need this next time
+		MaxBuildingIndex += amountOfBuildings;
 
+		// don't have any items on ground floor of the first building
+		if(isNewGame)
+			allGeneratedFloors.RemoveAt (0 - CurrentLevel.Buildings[0].BaseLevel);
+		
 		// now distribute POIs and pickable objects
 		int availableFloorsAmount = allGeneratedFloors.Count;
 		for(int i = 0; i < availableFloorsAmount; i += 2)
@@ -263,11 +285,11 @@ public class GameController : MonoBehaviour
 			
 			int selectedFloorIndex = UnityEngine.Random.Range(0, allGeneratedFloors.Count);
 			allGeneratedFloors[selectedFloorIndex].Person = person;
-
+			
 			person.transform.SetParent(allGeneratedFloors[selectedFloorIndex].transform);
 			person.transform.localPosition = Vector3.zero;
 			person.transform.localScale = Vector3.one;
-
+			
 			// then select his thoughts
 			List<Thought> ApplicableThoughts = new List<Thought>();
 			foreach(Thought t in ThoughtsPrefabs)
@@ -277,18 +299,20 @@ public class GameController : MonoBehaviour
 			}
 			Thought thought = Instantiate(ApplicableThoughts[UnityEngine.Random.Range(0, ApplicableThoughts.Count)]);
 			person.CurrentThought = thought;
-
+			
 			allGeneratedFloors.RemoveAt(selectedFloorIndex);
 			
 			if(allGeneratedFloors.Count <= 0)
 				return;
 
+			AmountOfMatchesLeft++;
+
 			// then corresponding pickable object
 			PickableObject pickable = Instantiate(person.CurrentThought.ContraryObjects[UnityEngine.Random.Range(0, person.CurrentThought.ContraryObjects.Count)]);
-
+			
 			selectedFloorIndex = UnityEngine.Random.Range(0, allGeneratedFloors.Count);
 			PutObjectOnFloor( pickable, allGeneratedFloors[selectedFloorIndex] );
-
+			
 			allGeneratedFloors.RemoveAt(selectedFloorIndex);
 		}
 	}
@@ -401,6 +425,14 @@ public class GameController : MonoBehaviour
 
 				TimeLeft += TIME_REWARD;
 				Score++;
+				AmountOfMatchesLeft--;
+
+				if(AmountOfMatchesLeft < MORE_BUILDINGS_TRESHOLD)
+				{
+					AmountOfMatchesLeft = 0;
+
+					GenerateNewBuildings(4, 4);
+				}
 			}
 		}
 	}
