@@ -72,9 +72,4 @@ public class PickableObject : MonoBehaviour
 	{
 		return !ObjectCharacterExclusions.ContainsKey(Type) || ObjectCharacterExclusions [Type].Contains(character);
 	}
-
-	public void PickUpObject()
-	{
-		// TODO
-	}
 }

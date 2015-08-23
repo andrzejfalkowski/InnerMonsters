@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -13,6 +15,8 @@ public class GameController : MonoBehaviour
 {
 	public CameraMgr CameraManager;
 	public Camera MainCamera;
+
+	public Image currentItem = null;
 
 	public Transform LevelParent;
 	public Level CurrentLevel;	
@@ -46,6 +50,9 @@ public class GameController : MonoBehaviour
 	const float TIME_LEFT = 30f;
 	const float TIME_REWARD = 5f;
 
+	const float Z_INSIDE_FLOOR = -0.5f;
+	const float Z_BEHIND_BUILDING = 0.5f;
+
 	public float TimeLeft = 0f;
 	public float TimePlayed = 0f;
 	public int Score = 0;
@@ -61,21 +68,20 @@ public class GameController : MonoBehaviour
 	}
 	public Floor CurrentFloor
 	{
-		get{ return CurrentBuilding.Floors[CurrentFloorIndex]; }
+		get{ return CameraManager.currentFloor; }
 	}
-
+	
 	void Awake()
 	{
 		MainCamera.orthographicSize = 4.0f;
-
 		StartNewGame();
 	}
 
 	// Use this for initialization
-	void Start () 
-	{
-
-	}
+//	void Start () 
+//	{
+//
+//	}
 	
 	// Update is called once per frame
 	void Update() 
@@ -97,9 +103,12 @@ public class GameController : MonoBehaviour
 				TimePlayed += Time.deltaTime;
 			}
 			Timer.text = "Time Left: " + ((int)TimeLeft).ToString() + "s";
+
+			if( Input.GetKeyUp("space") )
+				ObjectInteraction();
 		}
 
-		if(CurrentGameState == EGameState.GameOver)
+		else if(CurrentGameState == EGameState.GameOver)
 		{
 			if(Input.GetKey("space"))
 			{
@@ -199,7 +208,7 @@ public class GameController : MonoBehaviour
 			allGeneratedFloors[selectedFloorIndex].Person = person;
 
 			person.transform.SetParent(allGeneratedFloors[selectedFloorIndex].transform);
-			person.transform.localPosition = Vector3.zero;
+			person.transform.localPosition = Vector3.forward * Z_INSIDE_FLOOR;
 			person.transform.localScale = Vector3.one;
 
 			allGeneratedFloors.RemoveAt(selectedFloorIndex);
@@ -223,11 +232,7 @@ public class GameController : MonoBehaviour
 			PickableObject pickable = Instantiate(PickableObjectsPrefabs[UnityEngine.Random.Range(0, pickableObjectsAmount)]);
 
 			selectedFloorIndex = UnityEngine.Random.Range(0, allGeneratedFloors.Count);
-			allGeneratedFloors[selectedFloorIndex].Pickable = pickable;
-
-			pickable.transform.SetParent(allGeneratedFloors[selectedFloorIndex].transform);
-			pickable.transform.localPosition = Vector3.zero;
-			pickable.transform.localScale = Vector3.one;
+			PutObjectOnFloor( pickable, allGeneratedFloors[selectedFloorIndex] );
 
 			allGeneratedFloors.RemoveAt(selectedFloorIndex);
 		}
@@ -238,7 +243,7 @@ public class GameController : MonoBehaviour
 		CurrentBuildingIndex = 0;
 		CurrentFloorIndex = 0 - CurrentBuilding.BaseLevel;
 
-		CameraManager.currentFloor = CurrentFloor;
+		CameraManager.currentFloor = CurrentBuilding.Floors[CurrentFloorIndex];
 
 		TimeLeft = TIME_LEFT;
 		TimePlayed = 0f;
@@ -259,36 +264,54 @@ public class GameController : MonoBehaviour
 		}
 	}
 
-	void PickUpObject()
+	void ObjectInteraction()
 	{
-		if (CurrentFloor.Pickable != null)
-		{
-			if(CurrentlyPickedUpObject != null)
-				DropObject();
-			else
-			{
-				CurrentlyPickedUpObject = CurrentFloor.Pickable;
-				CurrentFloor.Pickable.PickUpObject();
-			}
-		}
+		if(CurrentlyPickedUpObject != null)
+			DropObject();
+		else
+			PutObjectOnHand();
+	}
 
+	void PutObjectOnHand()
+	{
+		if( CurrentFloor.Pickable != null )
+		{
+			CurrentlyPickedUpObject = CurrentFloor.Pickable;
+			currentItem.color = new Color( currentItem.color.r, currentItem.color.g, currentItem.color.b, 1.0f );
+			currentItem.sprite = CurrentlyPickedUpObject.GetComponent<SpriteRenderer>().sprite;
+			CurrentlyPickedUpObject.transform.localPosition = Vector3.forward * Z_BEHIND_BUILDING;
+			CurrentFloor.Pickable = null;
+		}
+	}
+
+	void RemoveObjectOfHand()
+	{
+		CurrentlyPickedUpObject = null;
+		currentItem.color = new Color( currentItem.color.r, currentItem.color.g, currentItem.color.b, 0.0f );
+		currentItem.sprite = null;
+	}
+
+	void PutObjectOnFloor( PickableObject pickable, Floor floor )
+	{
+		floor.Pickable = pickable;
+		pickable.transform.SetParent( floor.transform );
+		pickable.transform.localPosition = Vector3.forward * Z_INSIDE_FLOOR;
 	}
 
 	void DropObject()
 	{
-		if (CurrentlyPickedUpObject != null)
+		if( CurrentlyPickedUpObject != null )
 		{
-			if(CurrentFloor.Pickable != null)
+			if( CurrentFloor.Pickable != null )
 			{
 				PickableObject temp = CurrentlyPickedUpObject;
-				CurrentlyPickedUpObject = CurrentFloor.Pickable;
-				CurrentFloor.Pickable = temp;
-				CurrentlyPickedUpObject = temp;
+				PutObjectOnHand();
+				PutObjectOnFloor( temp, CurrentFloor );
 			}
 			else
 			{
-				CurrentFloor.Pickable = CurrentlyPickedUpObject;
-				CurrentlyPickedUpObject = null;
+				PutObjectOnFloor( CurrentlyPickedUpObject, CurrentFloor );
+				RemoveObjectOfHand();
 			}
 		}
 	}
