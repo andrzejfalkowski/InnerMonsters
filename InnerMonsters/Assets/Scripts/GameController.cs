@@ -302,8 +302,15 @@ public class GameController : MonoBehaviour
 			}
 			else
 			{
-				PutObjectOnFloor( CurrentlyPickedUpObject, CurrentFloor );
-				RemoveObjectOfHand();
+				if( CurrentFloor.Person != null )
+				{
+					InteractWithPerson();
+				}
+				else
+				{
+					PutObjectOnFloor( CurrentlyPickedUpObject, CurrentFloor );
+					RemoveObjectOfHand();
+				}
 			}
 		}
 	}
