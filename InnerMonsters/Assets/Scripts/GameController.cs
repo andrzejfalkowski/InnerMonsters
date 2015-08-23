@@ -21,6 +21,7 @@ public class GameController : MonoBehaviour
 
 	public Image currentItem = null;
 	public Image timer = null;
+	public GameObject timerContainer = null;
 
 	public Transform LevelParent;
 	public Level CurrentLevel;	
@@ -60,6 +61,10 @@ public class GameController : MonoBehaviour
 	public float TimeLeft = 0f;
 	public float TimePlayed = 0f;
 	public int Score = 0;
+	public Animation timerAnimation = null;
+	public float animateClockWhenSecondsLeft = 15.0f;
+
+	public float MAX_CLOCK_ANIMATION_SPEED = 3.0f;
 
 	public UnityEngine.UI.Text Timer;
 	public UnityEngine.UI.Text GameOverText;
@@ -117,11 +122,19 @@ public class GameController : MonoBehaviour
 				CurrentGameState = EGameState.GameOver;
 				CameraManager.enabled = false;
 				CurrentFloor.Reveal( false );
+				timerContainer.SetActive( false );
+				timerAnimation.Stop();
 			}
 			else
 			{
 				TimeLeft -= Time.deltaTime;
 				TimePlayed += Time.deltaTime;
+
+				if( TimeLeft < animateClockWhenSecondsLeft )
+				{
+					timerAnimation.Play();
+					timerAnimation["ClockBeat"].speed = MAX_CLOCK_ANIMATION_SPEED * (1 - (TimeLeft / animateClockWhenSecondsLeft) );
+				}
 			}
 //			Timer.text = "Time Left: " + ((int)TimeLeft).ToString() + "s";
 			Timer.text = ((int)TimeLeft).ToString();
@@ -276,6 +289,7 @@ public class GameController : MonoBehaviour
 		CurrentGameState = EGameState.GamePlay;
 		CameraManager.enabled = true;
 		CameraManager.UpdateArrows();
+		timerContainer.SetActive( true );
 
 		RemoveObjectOfHand();
 		CurrentFloor.Reveal( true );
