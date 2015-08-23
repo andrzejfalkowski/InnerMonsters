@@ -17,6 +17,7 @@ public class GameController : MonoBehaviour
 	public Camera MainCamera;
 
 	public Image currentItem = null;
+	public Image timer = null;
 
 	public Transform LevelParent;
 	public Level CurrentLevel;	
@@ -72,7 +73,7 @@ public class GameController : MonoBehaviour
 	
 	void Awake()
 	{
-		MainCamera.orthographicSize = 4.0f;
+		MainCamera.orthographicSize = 3.0f;
 		StartNewGame();
 	}
 
@@ -102,6 +103,7 @@ public class GameController : MonoBehaviour
 				TimePlayed += Time.deltaTime;
 			}
 			Timer.text = "Time Left: " + ((int)TimeLeft).ToString() + "s";
+			timer.fillAmount = TimeLeft / TIME_LEFT;
 
 			if( Input.GetKeyUp("space") )
 				ObjectInteraction();
