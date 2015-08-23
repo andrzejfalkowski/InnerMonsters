@@ -99,6 +99,7 @@ public class GameController : MonoBehaviour
 
 				CurrentGameState = EGameState.GameOver;
 				CameraManager.enabled = false;
+				CurrentFloor.Reveal( false );
 			}
 			else
 			{
@@ -254,8 +255,10 @@ public class GameController : MonoBehaviour
 
 		CurrentGameState = EGameState.GamePlay;
 		CameraManager.enabled = true;
+		RemoveObjectOfHand();
+		CurrentFloor.Reveal( true );
 
-		GameOverText.gameObject.SetActive(false);
+		GameOverText.gameObject.SetActive( false );
 		gameOverPanel.gameObject.SetActive( false );
 	}
 
