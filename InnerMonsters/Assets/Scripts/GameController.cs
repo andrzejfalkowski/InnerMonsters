@@ -31,7 +31,6 @@ public class GameController : MonoBehaviour
 
 	public List<PersonOfInterest> PeopleOfInterestPrefabs;
 	public List<Thought> ThoughtsPrefabs;
-	public List<PickableObject> PickableObjectsPrefabs;
 
 	[System.NonSerialized]
 	public PickableObject CurrentlyPickedUpObject;
