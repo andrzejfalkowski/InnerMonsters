@@ -62,7 +62,7 @@ public class CameraMgr : MonoBehaviour
 		transform.position = new Vector3(currentFloor.transform.position.x, currentFloor.transform.position.y + Y_SHIFT, transform.position.z);
 	}
 
-	void UpdateArrows()
+	public void UpdateArrows()
 	{
 		arrows[ (int)Dir.N ].gameObject.SetActive( currentFloor.nextFloors[ (int)Dir.N ] != null );
 		arrows[ (int)Dir.E ].gameObject.SetActive( currentFloor.nextFloors[ (int)Dir.E ] != null );

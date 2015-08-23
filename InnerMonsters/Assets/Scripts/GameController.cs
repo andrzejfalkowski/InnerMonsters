@@ -37,6 +37,7 @@ public class GameController : MonoBehaviour
 	public List<Thought> ThoughtsPrefabs;
 
 	//[System.NonSerialized]
+	public Animation itemContainerAnimation = null;
 	public PickableObject CurrentlyPickedUpObject;
 
 	const float FLOOR_HEIGHT = 1.6f;
@@ -274,6 +275,8 @@ public class GameController : MonoBehaviour
 
 		CurrentGameState = EGameState.GamePlay;
 		CameraManager.enabled = true;
+		CameraManager.UpdateArrows();
+
 		RemoveObjectOfHand();
 		CurrentFloor.Reveal( true );
 
@@ -308,6 +311,7 @@ public class GameController : MonoBehaviour
 			currentItem.sprite = CurrentlyPickedUpObject.GetComponentInChildren<SpriteRenderer>().sprite;
 			CurrentlyPickedUpObject.transform.localPosition = Vector3.forward * Z_BEHIND_BUILDING;
 			CurrentFloor.Pickable = null;
+			itemContainerAnimation.Play();
 		}
 	}
 
@@ -316,6 +320,7 @@ public class GameController : MonoBehaviour
 		CurrentlyPickedUpObject = null;
 		currentItem.color = new Color( currentItem.color.r, currentItem.color.g, currentItem.color.b, 0.0f );
 		currentItem.sprite = null;
+		itemContainerAnimation.Stop();
 	}
 
 	void PutObjectOnFloor( PickableObject pickable, Floor floor )
