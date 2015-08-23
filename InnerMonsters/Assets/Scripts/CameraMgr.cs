@@ -16,6 +16,8 @@ public class CameraMgr : MonoBehaviour
 	private Dir travellingDirection = Dir.NONE;
 
 	private const float TRAVEL_TIME = 3.0f;
+	private const float HORIZONTAL_VELOCITY_MULTIPLIER = 2.0f;
+	private const float VERTICAL_VELOCITY_MULTIPLIER = 0.8f;
 
 	void Start()
 	{
@@ -69,6 +71,12 @@ public class CameraMgr : MonoBehaviour
 		if( travelling )
 		{
 			float distanceCovered = (Time.time - startTravelling) * TRAVEL_TIME * travelDistance;
+
+			if( travellingDirection == Dir.N || travellingDirection == Dir.S )
+				distanceCovered *= HORIZONTAL_VELOCITY_MULTIPLIER;
+			else
+				distanceCovered *= VERTICAL_VELOCITY_MULTIPLIER;
+
 			float percentageCovered = distanceCovered / travelDistance;
 
 			if( percentageCovered > 1.0f )
