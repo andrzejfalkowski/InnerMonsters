@@ -13,7 +13,7 @@ public enum EBackgroundType
 }
 
 public enum Dir { N, E, S, W, NONE }
-enum Fade { NONE, IN, OUT }
+enum Fade { NONE, IN, OUT, IN_SPECIAL }
 
 public class Floor : MonoBehaviour 
 {
@@ -108,12 +108,12 @@ public class Floor : MonoBehaviour
 		}
 	}
 
-	public void Reveal( bool reveal )
+	public void Reveal( bool reveal, bool special = false )
 	{
 		if (Deactivated && reveal)
 			return;
 
-		fade = ( reveal ? Fade.OUT : Fade.IN );
+		fade = ( special ? Fade.IN_SPECIAL : ( reveal ? Fade.OUT : Fade.IN ) );
 
 		if(Person != null)
 		{
@@ -145,6 +145,9 @@ public class Floor : MonoBehaviour
 
 	public void Deactivate()
 	{
+		
+		Reveal(false, true);
+
 		Deactivated = true;
 
 		if(isTopFloor)
@@ -159,8 +162,6 @@ public class Floor : MonoBehaviour
 		{
 			ForegroundSpriteRenderer.sprite = ForegroundSprites[1];
 		}
-
-		Reveal(false);
 	}
 
 	void FixedUpdate()
@@ -189,6 +190,18 @@ public class Floor : MonoBehaviour
 				else
 					StopFade( 0.0f );
 
+				break;
+			}
+
+			case Fade.IN_SPECIAL:
+			{
+				float newAlpha = ForegroundSpriteRenderer.color.a + FADE_SPEED / 5.0f;
+				
+				if( newAlpha < 1.0f ) 
+					UpdateForegroundAlpha( newAlpha );
+				else
+					StopFade( 1.0f );
+				
 				break;
 			}
 		}
