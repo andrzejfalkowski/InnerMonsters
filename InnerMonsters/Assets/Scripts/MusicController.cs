@@ -39,13 +39,11 @@ public class MusicController : MonoBehaviour
 		if(CurrentTrack != music)
 		{
 			CurrentTrack = music;
-			MusicSource.clip = MusicList[(int)music];
-			MusicSource.Play();
-
 			if(CurrentTrack == EMusicType.None)
 			{
-				MusicSource.volume = 0f;
 				fade = Fade.IN;
+				MusicSource.clip = MusicList[(int)music];
+				MusicSource.Play();
 			}
 			else
 				fade = Fade.OUT;
@@ -74,7 +72,11 @@ public class MusicController : MonoBehaviour
 				if( newVolume > 0.0f ) 
 					UpdateMusicVolume( newVolume );
 				else
+				{
 					StopFade( 0.0f, Fade.IN );
+					MusicSource.clip = MusicList[(int)CurrentTrack];
+					MusicSource.Play();
+				}
 				break;
 			}
 		}
