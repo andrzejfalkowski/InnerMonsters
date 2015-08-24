@@ -115,6 +115,8 @@ public class GameController : MonoBehaviour
 	bool moreBuildingsIndicatorShown = false;
 	float moreBuildingsIndicatorTimer = 0f;
 	const float MORE_BUILDINGS_TIME = 3.0f;
+	
+	public GameObject GroundPrefab;
 
 	void Awake()
 	{
