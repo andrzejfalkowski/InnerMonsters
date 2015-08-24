@@ -67,8 +67,8 @@ public class GameController : MonoBehaviour
 	const int BUILDING_MIN_AMOUNT = 3;
 	const int BUILDING_MAX_AMOUNT = 5;
 
-	const int BUILDING_MIN_HEIGHT = 2;
-	const int BUILDING_MAX_HEIGHT = 5;
+	const int BUILDING_MIN_HEIGHT = 3;
+	const int BUILDING_MAX_HEIGHT = 6;
 
 	const float TIME_LEFT = 30f;
 	const float TIME_REWARD = 10f;
