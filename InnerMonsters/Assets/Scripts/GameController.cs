@@ -100,8 +100,9 @@ public class GameController : MonoBehaviour
 		get{ return CameraManager.currentFloor; }
 	}
 
+	public int MaxAmountOfMatches = 0;
 	public int AmountOfMatchesLeft = 0;
-	const int MORE_BUILDINGS_TRESHOLD = 2;
+	const float MORE_BUILDINGS_TRESHOLD = 0.5f;
 
 	private List<EThoughtType> thoughtsGeneratedDuringThisRound = new List<EThoughtType>();
 
@@ -120,6 +121,8 @@ public class GameController : MonoBehaviour
 	public GameObject GroundPrefab;
 	private float minGroundX = 0f;
 	private float maxGroundX = 0f;
+
+	private int amountOfBuildingsToCreate = 1;
 
 	void Awake()
 	{
@@ -208,7 +211,10 @@ public class GameController : MonoBehaviour
 				}
 				else
 				{
-					Music.PlayMusic(EMusicType.Gameplay);
+					if(IsFirstGame)
+						Music.PlayMusic(EMusicType.TutorialIntro);
+					else
+						Music.PlayMusic(EMusicType.Gameplay);
 				}
 
 				if(moreBuildingsIndicatorShown)
@@ -278,12 +284,12 @@ public class GameController : MonoBehaviour
 			UpdateTutorialState(ETutorialProgress.ArrowKeys);
 
 		AmountOfMatchesLeft = 0;
+		MaxAmountOfMatches = 0;
+		amountOfBuildingsToCreate = 1;
 
 		GenerateLevel();
 		
 		ResetPlayerState();
-
-		Music.PlayMusic(EMusicType.Gameplay);
 	}
 
 	void GenerateLevel()
@@ -292,7 +298,10 @@ public class GameController : MonoBehaviour
 
 		MaxBuildingIndex = 0;
 
-		GenerateNewBuildings(1, 1, true);
+		GenerateNewBuildings(amountOfBuildingsToCreate, amountOfBuildingsToCreate, true);
+
+		if(amountOfBuildingsToCreate < 8)
+			amountOfBuildingsToCreate *= 2;
 	}
 
 	void GenerateNewBuildings(int minAmount, int maxAmount, bool isNewGame = false)
@@ -483,6 +492,7 @@ public class GameController : MonoBehaviour
 				return;
 
 			AmountOfMatchesLeft++;
+			MaxAmountOfMatches++;
 
 			// then corresponding pickable object
 			PickableObject pickable = Instantiate(person.CurrentThought.ContraryObjects[UnityEngine.Random.Range(0, person.CurrentThought.ContraryObjects.Count)]);
@@ -619,11 +629,14 @@ public class GameController : MonoBehaviour
 
 				Sounds.PlaySound(ESoundType.Interact);
 
-				if(AmountOfMatchesLeft < MORE_BUILDINGS_TRESHOLD)
+				if(AmountOfMatchesLeft < MaxAmountOfMatches * MORE_BUILDINGS_TRESHOLD)
 				{
 					AmountOfMatchesLeft = 0;
+					MaxAmountOfMatches = 0;
 
-					GenerateNewBuildings(2, 2);
+					GenerateNewBuildings(amountOfBuildingsToCreate, amountOfBuildingsToCreate);
+					if(amountOfBuildingsToCreate < 8)
+						amountOfBuildingsToCreate *= 2;
 
 					MoreBuildingsIndicator.gameObject.SetActive(true);
 					moreBuildingsIndicatorShown = true;
