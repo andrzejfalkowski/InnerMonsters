@@ -539,7 +539,7 @@ public class GameController : MonoBehaviour
 		else
 			PutObjectOnHand();
 
-		if(CurrentFloor.Pickable == null && CurrentFloor.Person == null)
+		if((CurrentFloor.Pickable == null && CurrentFloor.Person == null) || CurrentFloor.Deactivated)
 			CurrentFloor.LightsOff();
 		else
 			CurrentFloor.LightsOn();
