@@ -44,6 +44,11 @@ public class CameraMgr : MonoBehaviour
 				{
 					MyGameController.CurrentFloorIndex++;
 					MyGameController.Sounds.PlaySound(ESoundType.SwipeUp);
+
+					// tutorial
+					if(MyGameController.TutorialProgress == ETutorialProgress.ArrowKeys 
+				  		&& MyGameController.CurrentFloorIndex == 2)
+						MyGameController.UpdateTutorialState(ETutorialProgress.PickUp);
 				}
 				break;
 			case Dir.E: 
@@ -53,6 +58,11 @@ public class CameraMgr : MonoBehaviour
 				{
 					MyGameController.CurrentBuildingIndex++;
 					MyGameController.Sounds.PlaySound(ESoundType.SwipeSide);
+
+					// tutorial
+					if(MyGameController.TutorialProgress == ETutorialProgress.Timer 
+					   && MyGameController.CurrentBuildingIndex == 1)
+						MyGameController.UpdateTutorialState(ETutorialProgress.Finished);
 				}
 				break;
 			case Dir.S: 
@@ -62,6 +72,12 @@ public class CameraMgr : MonoBehaviour
 				{
 					MyGameController.CurrentFloorIndex--;
 					MyGameController.Sounds.PlaySound(ESoundType.SwipeDown);
+
+					// tutorial
+					if(MyGameController.TutorialProgress == ETutorialProgress.PickUp 
+					   && MyGameController.CurrentFloorIndex == 0
+				   		&& MyGameController.CurrentlyPickedUpObject != null)
+						MyGameController.UpdateTutorialState(ETutorialProgress.Interact);
 				}
 				break;
 			case Dir.W: 
@@ -71,6 +87,11 @@ public class CameraMgr : MonoBehaviour
 				{
 					MyGameController.CurrentBuildingIndex--;
 					MyGameController.Sounds.PlaySound(ESoundType.SwipeSide);
+
+					// tutorial
+					if(MyGameController.TutorialProgress == ETutorialProgress.Timer 
+					   && MyGameController.CurrentBuildingIndex == -1)
+						MyGameController.UpdateTutorialState(ETutorialProgress.Finished);
 				}
 				break;
 		}

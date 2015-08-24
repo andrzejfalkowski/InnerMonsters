@@ -18,7 +18,6 @@ public enum ETutorialProgress
 	PickUp,
 	Interact,
 	Timer,
-	Unlock,
 	Finished,
 	Preparation
 }
@@ -217,8 +216,8 @@ public class GameController : MonoBehaviour
 
 	void StartNewGame()
 	{
-//		if(IsFirstGame)
-//			UpdateTutorialState(ETutorialProgress.ArrowKeys);
+		if(IsFirstGame)
+			UpdateTutorialState(ETutorialProgress.ArrowKeys);
 
 		GenerateLevel();
 		
@@ -267,7 +266,7 @@ public class GameController : MonoBehaviour
 			// "tutorial"
 			if(isNewGame && IsFirstGame)
 			{
-				newBuilding.BaseLevel = 0;
+				newBuilding.BaseLevel = -1;
 				buildingHeight = 3;
 			}
 
@@ -373,6 +372,13 @@ public class GameController : MonoBehaviour
 			person.Init();
 			
 			int selectedFloorIndex = UnityEngine.Random.Range(0, allGeneratedFloors.Count);
+
+			// tutorial - always person on 1st, then item on 2nd
+			if(isNewGame && IsFirstGame)
+			{
+				selectedFloorIndex = i;
+			}
+
 			allGeneratedFloors[selectedFloorIndex].Person = person;
 			
 			person.transform.SetParent(allGeneratedFloors[selectedFloorIndex].transform);
@@ -518,6 +524,11 @@ public class GameController : MonoBehaviour
 
 					GenerateNewBuildings(4, 4);
 				}
+
+				if(TutorialProgress == ETutorialProgress.Interact)
+				{
+					UpdateTutorialState(ETutorialProgress.Timer);
+				}
 			}
 			else
 			{
@@ -526,7 +537,7 @@ public class GameController : MonoBehaviour
 		}
 	}
 
-	void UpdateTutorialState(ETutorialProgress newProgress)
+	public void UpdateTutorialState(ETutorialProgress newProgress)
 	{
 		HideTutorial();
 
