@@ -114,6 +114,7 @@ public class CameraMgr : MonoBehaviour
 
 	public void Snap( )
 	{
+		travelling = false;
 		transform.position = new Vector3(currentFloor.transform.position.x, currentFloor.transform.position.y + Y_SHIFT, transform.position.z);
 	}
 

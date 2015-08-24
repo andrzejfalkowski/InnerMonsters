@@ -179,10 +179,8 @@ public class GameController : MonoBehaviour
 
 				MoreBuildingsIndicator.gameObject.SetActive(false);
 				HideTutorial();
-				// if tutorial wasn't finished, reset progress
-				if(TutorialProgress == ETutorialProgress.Finished)
-					IsFirstGame = false;
 
+				// if tutorial wasn't finished, reset progress
 				CurrentGameState = EGameState.GameOver;
 				CameraManager.enabled = false;
 				CurrentFloor.Reveal( false );
@@ -194,7 +192,8 @@ public class GameController : MonoBehaviour
 			}
 			else
 			{
-				TimeLeft -= Time.deltaTime;
+				if(!IsFirstGame)
+					TimeLeft -= Time.deltaTime;
 				TimePlayed += Time.deltaTime;
 
 				if( TimeLeft < animateClockWhenSecondsLeft )
@@ -277,6 +276,8 @@ public class GameController : MonoBehaviour
 	{
 		if(IsFirstGame)
 			UpdateTutorialState(ETutorialProgress.ArrowKeys);
+
+		AmountOfMatchesLeft = 0;
 
 		GenerateLevel();
 		
@@ -508,7 +509,9 @@ public class GameController : MonoBehaviour
 		CurrentGameState = EGameState.GamePlay;
 		CameraManager.enabled = true;
 		CameraManager.UpdateArrows();
-		timerContainer.SetActive( true );
+
+		if(!IsFirstGame)
+			timerContainer.SetActive( true );
 
 		RemoveObjectOfHand();
 		CurrentFloor.Reveal( true );
@@ -536,7 +539,7 @@ public class GameController : MonoBehaviour
 		else
 			PutObjectOnHand();
 
-		if(CurrentFloor.Pickable == null)
+		if(CurrentFloor.Pickable == null && CurrentFloor.Person == null)
 			CurrentFloor.LightsOff();
 		else
 			CurrentFloor.LightsOn();
@@ -641,6 +644,12 @@ public class GameController : MonoBehaviour
 
 	public void UpdateTutorialState(ETutorialProgress newProgress)
 	{
+		if(newProgress == ETutorialProgress.Finished)
+		{
+			IsFirstGame = false;
+			timerContainer.SetActive(true);
+		}
+
 		HideTutorial();
 
 		TutorialProgress = newProgress;
