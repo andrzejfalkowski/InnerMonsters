@@ -12,12 +12,24 @@ public enum EGameState
 	Transition
 }
 
+public enum ETutorialProgress
+{
+	ArrowKeys,
+	PickUp,
+	Interact,
+	Timer,
+	Unlock,
+	Finished,
+	Preparation
+}
+
 public class GameController : MonoBehaviour 
 {
 	public CameraMgr CameraManager;
 	public Camera MainCamera;
 
 	public MusicController Music;
+	public SoundsController Sounds;
 	public TransitionController Transition;
 
 	public GameObject MainMenuPanel;
@@ -57,7 +69,7 @@ public class GameController : MonoBehaviour
 	const int BUILDING_MAX_AMOUNT = 5;
 
 	const int BUILDING_MIN_HEIGHT = 2;
-	const int BUILDING_MAX_HEIGHT = 4;
+	const int BUILDING_MAX_HEIGHT = 5;
 
 	const float TIME_LEFT = 30f;
 	const float TIME_REWARD = 10f;
@@ -91,6 +103,14 @@ public class GameController : MonoBehaviour
 
 	public int AmountOfMatchesLeft = 0;
 	const int MORE_BUILDINGS_TRESHOLD = 2;
+
+	private List<EThoughtType> thoughtsGeneratedDuringThisRound = new List<EThoughtType>();
+
+	public bool IsFirstGame = true;
+
+	public ETutorialProgress TutorialProgress = ETutorialProgress.ArrowKeys;
+
+	public List<UnityEngine.UI.Text> TutorialTexts;
 
 	void Awake()
 	{
@@ -136,7 +156,12 @@ public class GameController : MonoBehaviour
 
 				GameOverText.gameObject.SetActive(true);
 				gameOverPanel.gameObject.SetActive( true );
-				GameOverText.text = "GAME OVER\nPathetic lives ruined: " + Score.ToString() +  "\nTime wasted: " + ((int)TimePlayed).ToString() + "s\nPress space to try again";
+				GameOverText.text = "GAME OVER\nPathetic lives ruined: " + Score.ToString() +  "\nTime wasted: " + ((int)TimePlayed).ToString() + "s\nPress SPACE to try again";
+
+				HideTutorial();
+				// if tutorial wasn't finished, reset progress
+				if(TutorialProgress == ETutorialProgress.Finished)
+					IsFirstGame = false;
 
 				CurrentGameState = EGameState.GameOver;
 				CameraManager.enabled = false;
@@ -144,6 +169,7 @@ public class GameController : MonoBehaviour
 				timerContainer.SetActive( false );
 				timerAnimation.Stop();
 
+				Sounds.PlaySound(ESoundType.GameOver);
 				Music.PlayMusic(EMusicType.GameOver);
 			}
 			else
@@ -191,6 +217,9 @@ public class GameController : MonoBehaviour
 
 	void StartNewGame()
 	{
+//		if(IsFirstGame)
+//			UpdateTutorialState(ETutorialProgress.ArrowKeys);
+
 		GenerateLevel();
 		
 		ResetPlayerState();
@@ -204,7 +233,7 @@ public class GameController : MonoBehaviour
 
 		MaxBuildingIndex = 0;
 
-		GenerateNewBuildings(BUILDING_MIN_AMOUNT, BUILDING_MAX_AMOUNT, true);
+		GenerateNewBuildings(BUILDING_MIN_AMOUNT, BUILDING_MAX_HEIGHT, true);
 	}
 
 	void GenerateNewBuildings(int minAmount, int maxAmount, bool isNewGame = false)
@@ -212,6 +241,11 @@ public class GameController : MonoBehaviour
 		// first create building and floors
 		List<Floor> allGeneratedFloors = new List<Floor>();
 		int amountOfBuildings = UnityEngine.Random.Range (minAmount, maxAmount);
+
+		// "tutorial"
+		if (isNewGame && IsFirstGame)
+			amountOfBuildings = 1;
+
 		for(int i = 0; i < amountOfBuildings; i++)
 		{
 			GameObject newBuildingObject = Instantiate(BuildingPrefab);
@@ -229,7 +263,14 @@ public class GameController : MonoBehaviour
 			// make sure each building is at least above the ground, we don't want any bunkers
 			if(buildingHeight + newBuilding.BaseLevel < BUILDING_MIN_HEIGHT)
 				buildingHeight = BUILDING_MIN_HEIGHT - newBuilding.BaseLevel;
-			
+
+			// "tutorial"
+			if(isNewGame && IsFirstGame)
+			{
+				newBuilding.BaseLevel = 0;
+				buildingHeight = 3;
+			}
+
 			// select facade
 			newBuilding.Init();
 			
@@ -276,7 +317,7 @@ public class GameController : MonoBehaviour
 			GameObject newRoof = Instantiate(RoofPrefab);
 			newRoof.transform.SetParent(newBuilding.transform);
 			Vector3 roofPos = Vector3.zero;
-			roofPos.y = FLOOR_HEIGHT * (newBuilding.BaseLevel + buildingHeight) - 0.15f;
+			roofPos.y = FLOOR_HEIGHT * (newBuilding.BaseLevel + buildingHeight);
 			newRoof.transform.localPosition = roofPos;
 			newRoof.transform.localScale = Vector3.one;	
 			newRoof.GetComponent<Roof>().Init();
@@ -293,8 +334,42 @@ public class GameController : MonoBehaviour
 		int availableFloorsAmount = allGeneratedFloors.Count;
 		for(int i = 0; i < availableFloorsAmount; i += 2)
 		{
-			// first person
-			PersonOfInterest person = Instantiate(PeopleOfInterestPrefabs[UnityEngine.Random.Range(0, PeopleOfInterestPrefabs.Count)]);
+			// first generate thought
+			List<Thought> ApplicableThoughts = new List<Thought>();
+			foreach(Thought t in ThoughtsPrefabs)
+			{
+				if(!thoughtsGeneratedDuringThisRound.Contains(t.ThoughtType))
+					ApplicableThoughts.Add(t);
+			}
+			
+			// no unique thoguhts available, fallback to any
+			if(ApplicableThoughts.Count == 0)
+			{
+				foreach(Thought t in ThoughtsPrefabs)
+				{
+					ApplicableThoughts.Add(t);
+				}
+			}
+			
+			// OK, allow thoughts to repeat again if all already exist
+			if(thoughtsGeneratedDuringThisRound.Count == ThoughtsPrefabs.Count)
+			{
+				thoughtsGeneratedDuringThisRound.Clear();
+			}
+			
+			Thought thought = Instantiate(ApplicableThoughts[UnityEngine.Random.Range(0, ApplicableThoughts.Count)]);
+			thoughtsGeneratedDuringThisRound.Add(thought.ThoughtType);
+
+			// then generate person
+			List<PersonOfInterest> ApplicablePeople = new List<PersonOfInterest>();
+			foreach(PersonOfInterest p in PeopleOfInterestPrefabs)
+			{
+				if(thought.CanBeAppliedToCharacter(p))
+					ApplicablePeople.Add(p);
+			}
+			
+			PersonOfInterest person = Instantiate(ApplicablePeople[UnityEngine.Random.Range(0, ApplicablePeople.Count)]);
+			person.CurrentThought = thought;
 			person.Init();
 			
 			int selectedFloorIndex = UnityEngine.Random.Range(0, allGeneratedFloors.Count);
@@ -303,17 +378,7 @@ public class GameController : MonoBehaviour
 			person.transform.SetParent(allGeneratedFloors[selectedFloorIndex].transform);
 			person.transform.localPosition = Vector3.zero;
 			person.transform.localScale = Vector3.one;
-			
-			// then select his thoughts
-			List<Thought> ApplicableThoughts = new List<Thought>();
-			foreach(Thought t in ThoughtsPrefabs)
-			{
-				if(t.CanBeAppliedToCharacter(person))
-					ApplicableThoughts.Add(t);
-			}
-			Thought thought = Instantiate(ApplicableThoughts[UnityEngine.Random.Range(0, ApplicableThoughts.Count)]);
-			person.CurrentThought = thought;
-			
+
 			allGeneratedFloors.RemoveAt(selectedFloorIndex);
 			
 			if(allGeneratedFloors.Count <= 0)
@@ -377,6 +442,8 @@ public class GameController : MonoBehaviour
 	{
 		if( CurrentFloor.Pickable != null )
 		{
+			Sounds.PlaySound(ESoundType.PickUp);
+
 			CurrentlyPickedUpObject = CurrentFloor.Pickable;
 			currentItem.color = new Color( currentItem.color.r, currentItem.color.g, currentItem.color.b, 1.0f );
 			currentItem.sprite = CurrentlyPickedUpObject.GetComponentInChildren<SpriteRenderer>().sprite;
@@ -396,6 +463,8 @@ public class GameController : MonoBehaviour
 
 	void PutObjectOnFloor( PickableObject pickable, Floor floor )
 	{
+		Sounds.PlaySound(ESoundType.Drop);
+
 		floor.Pickable = pickable;
 		pickable.transform.SetParent( floor.transform );
 		pickable.transform.localPosition = Vector3.zero;
@@ -441,6 +510,8 @@ public class GameController : MonoBehaviour
 				Score++;
 				AmountOfMatchesLeft--;
 
+				Sounds.PlaySound(ESoundType.Interact);
+
 				if(AmountOfMatchesLeft < MORE_BUILDINGS_TRESHOLD)
 				{
 					AmountOfMatchesLeft = 0;
@@ -448,6 +519,26 @@ public class GameController : MonoBehaviour
 					GenerateNewBuildings(4, 4);
 				}
 			}
+			else
+			{
+				Sounds.PlaySound(ESoundType.FailInteract);
+			}
 		}
+	}
+
+	void UpdateTutorialState(ETutorialProgress newProgress)
+	{
+		HideTutorial();
+
+		TutorialProgress = newProgress;
+
+		if(TutorialProgress != ETutorialProgress.Finished)
+			TutorialTexts[(int)TutorialProgress].gameObject.SetActive(true);
+	}
+
+	void HideTutorial()
+	{
+		if(TutorialProgress != ETutorialProgress.Finished)
+			TutorialTexts[(int)TutorialProgress].gameObject.SetActive(false);
 	}
 }

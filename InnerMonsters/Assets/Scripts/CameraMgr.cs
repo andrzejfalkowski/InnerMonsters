@@ -41,25 +41,37 @@ public class CameraMgr : MonoBehaviour
 				if(currentFloor.nextFloors[ (int)Dir.N ] == null) 
 					return;
 				else 
+				{
 					MyGameController.CurrentFloorIndex++;
+					MyGameController.Sounds.PlaySound(ESoundType.SwipeUp);
+				}
 				break;
 			case Dir.E: 
 				if(currentFloor.nextFloors[ (int)Dir.E ] == null) 
 					return;
-				else 
+				else
+				{
 					MyGameController.CurrentBuildingIndex++;
+					MyGameController.Sounds.PlaySound(ESoundType.SwipeSide);
+				}
 				break;
 			case Dir.S: 
 				if(currentFloor.nextFloors[ (int)Dir.S ] == null) 
 					return;
 				else 
+				{
 					MyGameController.CurrentFloorIndex--;
+					MyGameController.Sounds.PlaySound(ESoundType.SwipeDown);
+				}
 				break;
 			case Dir.W: 
 				if(currentFloor.nextFloors[ (int)Dir.W ] == null) 
 					return;
 				else 
+				{
 					MyGameController.CurrentBuildingIndex--;
+					MyGameController.Sounds.PlaySound(ESoundType.SwipeSide);
+				}
 				break;
 		}
 		

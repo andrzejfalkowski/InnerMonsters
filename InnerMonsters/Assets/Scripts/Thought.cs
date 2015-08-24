@@ -4,20 +4,25 @@ using System.Collections.Generic;
 
 public enum EThoughtType
 {
-	Water,
-	Angels,
-	Dog,
-	Cat,
-	RedHeels,
-	Burglar,
-	Police,
-	Lilly,
-	BusinessCase,
-	Fireman
+	Coolness,
+	Engagement,
+	Fire,
+	Food,
+	Lungs,
+	Money,
+	Parents,
+	Pregnant,
+	Religion,
+	Taxi,
+	Thirst,
+	VideoGame,
+	Tired
 }
 
 public class Thought : MonoBehaviour 
 {
+	public EThoughtType ThoughtType;
+
 	public List<string> BubbleSpeeches;
 	public List<PersonOfInterest> SpecificCharactersOnly;
 

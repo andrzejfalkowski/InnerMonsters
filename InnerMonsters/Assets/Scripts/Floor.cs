@@ -13,7 +13,7 @@ public enum EBackgroundType
 }
 
 public enum Dir { N, E, S, W, NONE }
-enum Fade { NONE, IN, OUT, IN_SPECIAL }
+enum Fade { NONE, IN, OUT, IN_PAUSE, IN_SPECIAL }
 
 public class Floor : MonoBehaviour 
 {
@@ -30,6 +30,8 @@ public class Floor : MonoBehaviour
 
 	private Fade fade = Fade.NONE;
 	private const float FADE_SPEED = 0.05f;
+	private const float FADE_PAUSE_TIME = 3f;
+	private float fadePauseTimer = FADE_PAUSE_TIME;
 
 	public bool Deactivated = false;
 
@@ -110,10 +112,10 @@ public class Floor : MonoBehaviour
 
 	public void Reveal( bool reveal, bool special = false )
 	{
-		if (Deactivated && reveal)
+		if (Deactivated)
 			return;
 
-		fade = ( special ? Fade.IN_SPECIAL : ( reveal ? Fade.OUT : Fade.IN ) );
+		fade = ( special ? Fade.IN_PAUSE : ( reveal ? Fade.OUT : Fade.IN ) );
 
 		if(Person != null)
 		{
@@ -189,6 +191,15 @@ public class Floor : MonoBehaviour
 					UpdateForegroundAlpha( newAlpha );
 				else
 					StopFade( 0.0f );
+
+				break;
+			}
+
+			case Fade.IN_PAUSE:
+			{
+				fadePauseTimer -= Time.fixedDeltaTime;
+				if(fadePauseTimer <= 0f)
+					fade = Fade.IN_SPECIAL;
 
 				break;
 			}
