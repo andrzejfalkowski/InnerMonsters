@@ -35,7 +35,7 @@ public class PersonOfInterest : MonoBehaviour
 	//public EThoughtType ThoughtType;
 
 	public SpriteRenderer ThoughtSymbolRenderer;
-	public TextMesh ThoughtDescription;
+	public SmartTextMesh ThoughtDescription;
 
 	public EClothesStyle ClothesStyle;
 
@@ -81,7 +81,8 @@ public class PersonOfInterest : MonoBehaviour
 	{
 		descriptionShown = true;
 
-		ThoughtDescription.text = CurrentThought.BubbleSpeeches[UnityEngine.Random.Range (0, CurrentThought.BubbleSpeeches.Count)].Replace("\\n","\n");
+		ThoughtDescription.UnwrappedText = CurrentThought.BubbleSpeeches[UnityEngine.Random.Range (0, CurrentThought.BubbleSpeeches.Count)];
+		ThoughtDescription.NeedsLayout = true;
 
 		ThoughtSymbolRenderer.gameObject.SetActive(false);
 		ThoughtDescription.gameObject.SetActive(true);
@@ -93,8 +94,9 @@ public class PersonOfInterest : MonoBehaviour
 
 		descriptionShown = true;
 		
-		ThoughtDescription.text = CurrentThought.TraumaSpeeches[UnityEngine.Random.Range (0, CurrentThought.TraumaSpeeches.Count)].Replace("\\n","\n");
-		
+		ThoughtDescription.UnwrappedText = CurrentThought.TraumaSpeeches[UnityEngine.Random.Range (0, CurrentThought.TraumaSpeeches.Count)];
+		ThoughtDescription.NeedsLayout = true;
+
 		ThoughtSymbolRenderer.gameObject.SetActive(false);
 		ThoughtDescription.gameObject.SetActive(true);
 
