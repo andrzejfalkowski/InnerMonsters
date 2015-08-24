@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public enum EGameState
 {
-	Preparation,
+	MainMenu,
 	GamePlay,
 	GameOver,
 	Transition
@@ -141,7 +141,7 @@ public class GameController : MonoBehaviour
 	// Update is called once per frame
 	void Update() 
 	{
-		if(CurrentGameState == EGameState.Preparation)
+		if(CurrentGameState == EGameState.MainMenu)
 		{
 			if(Input.GetKey("space"))
 			{
@@ -155,8 +155,18 @@ public class GameController : MonoBehaviour
 					null
 				);
 			}
+			else if(Input.GetKey(KeyCode.Escape))
+			{
+				CurrentGameState = EGameState.Transition;
+				Transition.StartFade(
+					()=>{
+					Application.Quit();
+				},
+				null
+				);
+			}
 		}
-
+		
 		if(CurrentGameState == EGameState.GamePlay)
 		{
 			if(TimeLeft < 0f)
@@ -218,6 +228,20 @@ public class GameController : MonoBehaviour
 
 			if( Input.GetKeyUp("space") )
 				ObjectInteraction();
+			else if(Input.GetKey(KeyCode.Escape))
+			{
+				CurrentGameState = EGameState.Transition;
+				
+				Music.PlayMusic(EMusicType.TitleScreen);
+				Transition.StartFade(
+					()=>{
+					CurrentGameState = EGameState.MainMenu;
+					MainMenuPanel.SetActive(true);
+					InGamePanel.SetActive(false);
+				},
+				null
+				);
+			}
 		}
 
 		else if(CurrentGameState == EGameState.GameOver)
@@ -230,6 +254,20 @@ public class GameController : MonoBehaviour
 						StartNewGame();
 					},
 					null
+				);
+			}
+			else if(Input.GetKey(KeyCode.Escape))
+			{
+				CurrentGameState = EGameState.Transition;
+				
+				Music.PlayMusic(EMusicType.TitleScreen);
+				Transition.StartFade(
+					()=>{
+					CurrentGameState = EGameState.MainMenu;
+					MainMenuPanel.SetActive(true);
+					InGamePanel.SetActive(false);
+				},
+				null
 				);
 			}
 		}
