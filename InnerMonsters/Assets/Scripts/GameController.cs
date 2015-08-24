@@ -232,7 +232,7 @@ public class GameController : MonoBehaviour
 
 		MaxBuildingIndex = 0;
 
-		GenerateNewBuildings(BUILDING_MIN_AMOUNT, BUILDING_MAX_HEIGHT, true);
+		GenerateNewBuildings(1, 1, true);
 	}
 
 	void GenerateNewBuildings(int minAmount, int maxAmount, bool isNewGame = false)
@@ -242,7 +242,7 @@ public class GameController : MonoBehaviour
 		int amountOfBuildings = UnityEngine.Random.Range (minAmount, maxAmount);
 
 		// "tutorial"
-		if (isNewGame && IsFirstGame)
+		if (isNewGame)
 			amountOfBuildings = 1;
 
 		for(int i = 0; i < amountOfBuildings; i++)
@@ -252,7 +252,11 @@ public class GameController : MonoBehaviour
 			
 			newBuilding.transform.SetParent(LevelParent);
 			Vector3 buildingPos = Vector3.zero;
-			buildingPos.x = BUILDING_WIDTH * (i + MaxBuildingIndex);
+			buildingPos.x = BUILDING_WIDTH * (float)(((int)(i + MaxBuildingIndex + 1)) / 2);
+
+			if((i + MaxBuildingIndex) % 2 == 0)
+				buildingPos.x *= -1f;
+
 			newBuilding.transform.localPosition = buildingPos;
 			newBuilding.transform.localScale = Vector3.one;
 			
@@ -264,7 +268,7 @@ public class GameController : MonoBehaviour
 				buildingHeight = BUILDING_MIN_HEIGHT - newBuilding.BaseLevel;
 
 			// "tutorial"
-			if(isNewGame && IsFirstGame)
+			if(isNewGame)
 			{
 				newBuilding.BaseLevel = -1;
 				buildingHeight = 3;
@@ -272,9 +276,18 @@ public class GameController : MonoBehaviour
 
 			// select facade
 			newBuilding.Init();
-			
-			CurrentLevel.Buildings.Add(newBuilding);
-			
+
+			int buildingsIndex = 0;
+			if((i + MaxBuildingIndex) % 2 == 1)
+			{
+				buildingsIndex = CurrentLevel.Buildings.Count;
+				CurrentLevel.Buildings.Add(newBuilding);
+			}
+			else
+			{
+				CurrentLevel.Buildings.Insert(0,newBuilding);
+			}
+
 			for(int j = 0; j < buildingHeight; j++)
 			{
 				GameObject newFloorObject = Instantiate(FloorPrefab);
@@ -300,7 +313,7 @@ public class GameController : MonoBehaviour
 			}
 			
 			// assign horizontal neighbours
-			if(i > 0)
+			if(buildingsIndex > 0)
 			{
 				newBuilding.GetGroundFloor().nextFloors[(int)Dir.W] = CurrentLevel.Buildings[CurrentLevel.Buildings.Count - 2].GetGroundFloor();
 				CurrentLevel.Buildings[CurrentLevel.Buildings.Count - 2].GetGroundFloor().nextFloors[(int)Dir.E] = newBuilding.GetGroundFloor();
@@ -308,8 +321,8 @@ public class GameController : MonoBehaviour
 			// bridge between generated segments
 			else if(!isNewGame)
 			{
-				newBuilding.GetGroundFloor().nextFloors[(int)Dir.W] = CurrentLevel.Buildings[MaxBuildingIndex - 1].GetGroundFloor();
-				CurrentLevel.Buildings[MaxBuildingIndex - 1].GetGroundFloor().nextFloors[(int)Dir.E] = newBuilding.GetGroundFloor();
+				newBuilding.GetGroundFloor().nextFloors[(int)Dir.E] = CurrentLevel.Buildings[buildingsIndex + 1].GetGroundFloor();
+				CurrentLevel.Buildings[buildingsIndex + 1].GetGroundFloor().nextFloors[(int)Dir.W] = newBuilding.GetGroundFloor();
 			}
 			
 			// add roof on top of the building
@@ -522,7 +535,7 @@ public class GameController : MonoBehaviour
 				{
 					AmountOfMatchesLeft = 0;
 
-					GenerateNewBuildings(4, 4);
+					GenerateNewBuildings(2, 2);
 				}
 
 				if(TutorialProgress == ETutorialProgress.Interact)
