@@ -53,6 +53,7 @@ public class GameController : MonoBehaviour
 
 	public List<PersonOfInterest> PeopleOfInterestPrefabs;
 	public List<Thought> ThoughtsPrefabs;
+	public List<PickableObject> PickablePrefabs;
 
 	//[System.NonSerialized]
 	public Animation itemContainerAnimation = null;
@@ -102,7 +103,7 @@ public class GameController : MonoBehaviour
 
 	public int MaxAmountOfMatches = 0;
 	public int AmountOfMatchesLeft = 0;
-	const float MORE_BUILDINGS_TRESHOLD = 0.5f;
+	const float MORE_BUILDINGS_TRESHOLD = 0.6f;
 
 	private List<EThoughtType> thoughtsGeneratedDuringThisRound = new List<EThoughtType>();
 
@@ -337,7 +338,7 @@ public class GameController : MonoBehaviour
 				buildingHeight = BUILDING_MIN_HEIGHT - newBuilding.BaseLevel;
 
 			// "tutorial"
-			if(isNewGame)
+			if(isNewGame && IsFirstGame)
 			{
 				newBuilding.BaseLevel = -1;
 				buildingHeight = 3;
@@ -464,7 +465,7 @@ public class GameController : MonoBehaviour
 			List<PersonOfInterest> ApplicablePeople = new List<PersonOfInterest>();
 			foreach(PersonOfInterest p in PeopleOfInterestPrefabs)
 			{
-				if(thought.CanBeAppliedToCharacter(p))
+				if( thought.CanBeAppliedToCharacter(p))
 					ApplicablePeople.Add(p);
 			}
 			
@@ -495,7 +496,11 @@ public class GameController : MonoBehaviour
 			MaxAmountOfMatches++;
 
 			// then corresponding pickable object
-			PickableObject pickable = Instantiate(person.CurrentThought.ContraryObjects[UnityEngine.Random.Range(0, person.CurrentThought.ContraryObjects.Count)]);
+			PickableObject pickable ;
+			if(i > availableFloorsAmount / 2)
+				pickable = Instantiate(PickablePrefabs[UnityEngine.Random.Range(0, PickablePrefabs.Count)]);
+			else
+				pickable = Instantiate(person.CurrentThought.ContraryObjects[UnityEngine.Random.Range(0, person.CurrentThought.ContraryObjects.Count)]);
 			
 			selectedFloorIndex = UnityEngine.Random.Range(0, allGeneratedFloors.Count);
 			PutObjectOnFloor( pickable, allGeneratedFloors[selectedFloorIndex] );
