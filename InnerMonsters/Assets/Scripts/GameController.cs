@@ -115,8 +115,11 @@ public class GameController : MonoBehaviour
 	bool moreBuildingsIndicatorShown = false;
 	float moreBuildingsIndicatorTimer = 0f;
 	const float MORE_BUILDINGS_TIME = 3.0f;
-	
+
+	public Transform ParallaxesParent;
 	public GameObject GroundPrefab;
+	private float minGroundX = 0f;
+	private float maxGroundX = 0f;
 
 	void Awake()
 	{
@@ -336,13 +339,32 @@ public class GameController : MonoBehaviour
 				newBuilding.GetGroundFloor().nextFloors[(int)Dir.W] = CurrentLevel.Buildings[CurrentLevel.Buildings.Count - 2].GetGroundFloor();
 				CurrentLevel.Buildings[CurrentLevel.Buildings.Count - 2].GetGroundFloor().nextFloors[(int)Dir.E] = newBuilding.GetGroundFloor();
 			}
-			// bridge between generated segments
 			else if(!isNewGame)
 			{
 				newBuilding.GetGroundFloor().nextFloors[(int)Dir.E] = CurrentLevel.Buildings[buildingsIndex + 1].GetGroundFloor();
 				CurrentLevel.Buildings[buildingsIndex + 1].GetGroundFloor().nextFloors[(int)Dir.W] = newBuilding.GetGroundFloor();
 			}
-			
+
+			// generate ground if needed
+			if(MaxBuildingIndex > maxGroundX / 5f)
+			{
+				GameObject ground1 = Instantiate(GroundPrefab);
+				ground1.transform.SetParent(ParallaxesParent);
+				Vector3 ground1Pos = Vector3.zero;
+				minGroundX -= 108f;
+				ground1Pos.x = minGroundX;
+				ground1.transform.localPosition = ground1Pos;
+				ground1.transform.localScale = Vector3.one;
+
+				GameObject ground2 = Instantiate(GroundPrefab);
+				ground2.transform.SetParent(ParallaxesParent);
+				Vector3 ground2Pos = Vector3.zero;
+				maxGroundX += 108f;
+				ground2Pos.x = maxGroundX;
+				ground2.transform.localPosition = ground2Pos;
+				ground2.transform.localScale = Vector3.one;
+			}
+
 			// add roof on top of the building
 			GameObject newRoof = Instantiate(RoofPrefab);
 			newRoof.transform.SetParent(newBuilding.transform);
