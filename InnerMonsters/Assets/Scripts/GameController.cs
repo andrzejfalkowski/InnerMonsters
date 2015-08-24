@@ -111,6 +111,11 @@ public class GameController : MonoBehaviour
 
 	public List<UnityEngine.UI.Text> TutorialTexts;
 
+	public UnityEngine.UI.Text MoreBuildingsIndicator;
+	bool moreBuildingsIndicatorShown = false;
+	float moreBuildingsIndicatorTimer = 0f;
+	const float MORE_BUILDINGS_TIME = 3.0f;
+
 	void Awake()
 	{
 		CameraManager.enabled = false;
@@ -157,6 +162,7 @@ public class GameController : MonoBehaviour
 				gameOverPanel.gameObject.SetActive( true );
 				GameOverText.text = "GAME OVER\nPathetic lives ruined: " + Score.ToString() +  "\nTime wasted: " + ((int)TimePlayed).ToString() + "s\nPress SPACE to try again";
 
+				MoreBuildingsIndicator.gameObject.SetActive(false);
 				HideTutorial();
 				// if tutorial wasn't finished, reset progress
 				if(TutorialProgress == ETutorialProgress.Finished)
@@ -189,6 +195,16 @@ public class GameController : MonoBehaviour
 				else
 				{
 					Music.PlayMusic(EMusicType.Gameplay);
+				}
+
+				if(moreBuildingsIndicatorShown)
+				{
+					moreBuildingsIndicatorTimer -= Time.deltaTime;
+					if( moreBuildingsIndicatorTimer < 0 )
+					{
+						moreBuildingsIndicatorShown = false;
+						MoreBuildingsIndicator.gameObject.SetActive(false);
+					}
 				}
 			}
 //			Timer.text = "Time Left: " + ((int)TimeLeft).ToString() + "s";
@@ -536,6 +552,10 @@ public class GameController : MonoBehaviour
 					AmountOfMatchesLeft = 0;
 
 					GenerateNewBuildings(2, 2);
+
+					MoreBuildingsIndicator.gameObject.SetActive(true);
+					moreBuildingsIndicatorShown = true;
+					moreBuildingsIndicatorTimer = MORE_BUILDINGS_TIME;
 				}
 
 				if(TutorialProgress == ETutorialProgress.Interact)
