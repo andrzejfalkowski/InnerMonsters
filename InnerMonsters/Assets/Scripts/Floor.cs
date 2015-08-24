@@ -152,6 +152,11 @@ public class Floor : MonoBehaviour
 
 		Deactivated = true;
 
+
+	}
+
+	public void LightsOff()
+	{	
 		if(isTopFloor)
 		{
 			ForegroundSpriteRenderer.sprite = ForegroundTopSprites[1];
@@ -163,6 +168,22 @@ public class Floor : MonoBehaviour
 		else if(!isBasement)
 		{
 			ForegroundSpriteRenderer.sprite = ForegroundSprites[1];
+		}
+	}
+
+	public void LightsOn()
+	{	
+		if(isTopFloor)
+		{
+			ForegroundSpriteRenderer.sprite = ForegroundTopSprites[0];
+		}
+		else if(isBottomFloor)
+		{
+			ForegroundSpriteRenderer.sprite = ForegroundBottomSprites[0];
+		}
+		else if(!isBasement)
+		{
+			ForegroundSpriteRenderer.sprite = ForegroundSprites[0];
 		}
 	}
 

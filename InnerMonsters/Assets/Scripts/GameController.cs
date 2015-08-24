@@ -475,6 +475,8 @@ public class GameController : MonoBehaviour
 		RemoveObjectOfHand();
 		CurrentFloor.Reveal( true );
 
+		CurrentFloor.LightsOff();
+
 		GameOverText.gameObject.SetActive( false );
 		gameOverPanel.gameObject.SetActive( false );
 	}
@@ -495,6 +497,11 @@ public class GameController : MonoBehaviour
 			DropObject();
 		else
 			PutObjectOnHand();
+
+		if(CurrentFloor.Pickable == null)
+			CurrentFloor.LightsOff();
+		else
+			CurrentFloor.LightsOn();
 	}
 
 	void PutObjectOnHand()
