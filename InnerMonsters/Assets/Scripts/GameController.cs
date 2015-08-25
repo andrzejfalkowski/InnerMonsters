@@ -9,7 +9,8 @@ public enum EGameState
 	MainMenu,
 	GamePlay,
 	GameOver,
-	Transition
+	Transition,
+	Credits
 }
 
 public enum ETutorialProgress
@@ -19,7 +20,7 @@ public enum ETutorialProgress
 	Interact,
 	Timer,
 	Finished,
-	Preparation
+	Preparation,
 }
 
 public class GameController : MonoBehaviour 
@@ -33,6 +34,7 @@ public class GameController : MonoBehaviour
 
 	public GameObject MainMenuPanel;
 	public GameObject InGamePanel;
+	public GameObject CreditsPanel;
 
 	public Image currentItem = null;
 	public Image timer = null;
@@ -125,11 +127,19 @@ public class GameController : MonoBehaviour
 
 	private int amountOfBuildingsToCreate = 1;
 
+	private float fingerStartTime  = 0.0f;
+	private Vector2 fingerStartPos = Vector2.zero;
+	
+	private bool isSwipe = false;
+	private float minSwipeDist  = 50.0f;
+	private float maxSwipeTime = 0.5f;
+
 	void Awake()
 	{
 		CameraManager.enabled = false;
 		InGamePanel.SetActive(false);
 		MainMenuPanel.SetActive(true);
+		CreditsPanel.SetActive(false);
 
 		MainCamera.orthographicSize = 2.5f;
 
@@ -141,22 +151,64 @@ public class GameController : MonoBehaviour
 //	{
 //
 //	}
-	
+
 	// Update is called once per frame
 	void Update() 
 	{
 		if(CurrentGameState == EGameState.MainMenu)
 		{
+#if UNITY_ANDROID
+			if(Input.GetMouseButtonUp(0))
+#else
 			if(Input.GetKey("space"))
+#endif
+
 			{
 				CurrentGameState = EGameState.Transition;
 				Transition.StartFade(
 					()=>{
 						MainMenuPanel.SetActive(false);
+						CreditsPanel.SetActive(false);
 						InGamePanel.SetActive(true);
 						StartNewGame();
 					},
 					null
+				);
+			}
+			else if(Input.GetKey(KeyCode.Escape))
+			{
+				CurrentGameState = EGameState.Transition;
+				Transition.StartFade(
+					()=>{
+					MainMenuPanel.SetActive(false);
+					CreditsPanel.SetActive(true);
+					InGamePanel.SetActive(false);
+					CurrentGameState = EGameState.Credits;
+					//Application.Quit();
+				},
+				null
+				);
+			}
+		}
+
+		if(CurrentGameState == EGameState.Credits)
+		{
+#if UNITY_ANDROID
+			if(Input.GetMouseButtonUp(0))
+#else
+			if(Input.GetKey("space"))
+#endif
+					
+			{
+				CurrentGameState = EGameState.Transition;
+				Transition.StartFade(
+					()=>{
+					MainMenuPanel.SetActive(false);
+					CreditsPanel.SetActive(false);
+					InGamePanel.SetActive(true);
+					StartNewGame();
+				},
+				null
 				);
 			}
 			else if(Input.GetKey(KeyCode.Escape))
@@ -170,7 +222,7 @@ public class GameController : MonoBehaviour
 				);
 			}
 		}
-		
+
 		if(CurrentGameState == EGameState.GamePlay)
 		{
 			if(TimeLeft < 0f)
@@ -179,8 +231,11 @@ public class GameController : MonoBehaviour
 
 				GameOverText.gameObject.SetActive(true);
 				gameOverPanel.gameObject.SetActive( true );
+#if UNITY_ANDROID
+				GameOverText.text = "GAME OVER\nPathetic lives ruined: " + Score.ToString() +  "\nTime wasted: " + ((int)TimePlayed).ToString() + "s\nTap to try again";
+#else
 				GameOverText.text = "GAME OVER\nPathetic lives ruined: " + Score.ToString() +  "\nTime wasted: " + ((int)TimePlayed).ToString() + "s\nPress SPACE to try again";
-
+#endif
 				MoreBuildingsIndicator.gameObject.SetActive(false);
 				HideTutorial();
 
@@ -232,9 +287,89 @@ public class GameController : MonoBehaviour
 			Timer.text = ((int)TimeLeft).ToString();
 			timer.fillAmount = TimeLeft / TIME_LEFT;
 
-			if( Input.GetKeyUp("space") )
+#if UNITY_ANDROID
+			// swipe detection source: http://pfonseca.com/swipe-detection-on-unity/
+			if (Input.touchCount > 0)
+			{		
+				foreach (Touch touch in Input.touches)
+				{
+					switch (touch.phase)
+					{
+						case TouchPhase.Began :
+							/* this is a new touch */
+							isSwipe = true;
+							fingerStartTime = Time.time;
+							fingerStartPos = touch.position;
+						break;
+							
+						case TouchPhase.Canceled :
+							/* The touch is being canceled */
+							isSwipe = false;
+						break;
+							
+						case TouchPhase.Ended :
+							
+							float gestureTime = Time.time - fingerStartTime;
+							float gestureDist = (touch.position - fingerStartPos).magnitude;
+							
+							bool realSwipe = false;
+							if (isSwipe && gestureTime < maxSwipeTime && gestureDist > minSwipeDist)
+							{
+								Vector2 direction = touch.position - fingerStartPos;
+								Vector2 swipeType = Vector2.zero;
+								
+								if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+								{
+									// the swipe is horizontal:
+									swipeType = Vector2.right * Mathf.Sign(direction.x);
+								}
+								else
+								{
+									// the swipe is vertical:
+									swipeType = Vector2.up * Mathf.Sign(direction.y);
+								}
+								
+								if(swipeType.x != 0.0f)
+								{
+									if(swipeType.x > 0.0f)
+									{
+										realSwipe = true;
+										CameraManager.GoTo (Dir.W);
+									}
+									else
+									{
+										realSwipe = true;
+										CameraManager.GoTo (Dir.E);
+									}
+								}
+								
+								if(swipeType.y != 0.0f )
+								{
+									if(swipeType.y > 0.0f)
+									{
+										realSwipe = true;
+										CameraManager.GoTo (Dir.S);
+									}
+									else
+									{
+										realSwipe = true;
+										CameraManager.GoTo (Dir.N);
+									}
+								}
+								
+							}	
+							if(!realSwipe)
+								ObjectInteraction();
+							
+						break;
+					}
+				}
+			}
+#else
+			if(Input.GetKey("space"))
 				ObjectInteraction();
-			else if(Input.GetKey(KeyCode.Escape))
+#endif
+			if(Input.GetKey(KeyCode.Escape))
 			{
 				CurrentGameState = EGameState.Transition;
 				
@@ -243,6 +378,7 @@ public class GameController : MonoBehaviour
 					()=>{
 					CurrentGameState = EGameState.MainMenu;
 					MainMenuPanel.SetActive(true);
+					CreditsPanel.SetActive(false);
 					InGamePanel.SetActive(false);
 				},
 				null
@@ -252,7 +388,11 @@ public class GameController : MonoBehaviour
 
 		else if(CurrentGameState == EGameState.GameOver)
 		{
+#if UNITY_ANDROID
+			if(Input.GetMouseButtonUp(0))
+#else
 			if(Input.GetKey("space"))
+#endif
 			{
 				CurrentGameState = EGameState.Transition;
 				Transition.StartFade(
@@ -271,6 +411,7 @@ public class GameController : MonoBehaviour
 					()=>{
 					CurrentGameState = EGameState.MainMenu;
 					MainMenuPanel.SetActive(true);
+					CreditsPanel.SetActive(false);
 					InGamePanel.SetActive(false);
 				},
 				null

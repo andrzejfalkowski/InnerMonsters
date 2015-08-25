@@ -17,7 +17,13 @@ public class CameraMgr : MonoBehaviour
 	private Vector3 targetPosition = Vector3.zero;
 	private Dir travellingDirection = Dir.NONE;
 
+
+#if UNITY_ANDROID
+	// faster movement as handicap for swipe delay
+	private const float TRAVEL_TIME = 5.0f;
+#else
 	private const float TRAVEL_TIME = 3.0f;
+#endif
 	private const float HORIZONTAL_VELOCITY_MULTIPLIER = 2.0f;
 	private const float VERTICAL_VELOCITY_MULTIPLIER = 0.8f;
 	private const float Y_SHIFT = 1.0f;
