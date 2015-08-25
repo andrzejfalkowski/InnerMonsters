@@ -160,7 +160,7 @@ public class GameController : MonoBehaviour
 #if UNITY_ANDROID
 			if(Input.GetMouseButtonUp(0))
 #else
-			if(Input.GetKey("space"))
+			if(Input.GetKeyDown("space"))
 #endif
 
 			{
@@ -196,7 +196,7 @@ public class GameController : MonoBehaviour
 #if UNITY_ANDROID
 			if(Input.GetMouseButtonUp(0))
 #else
-			if(Input.GetKey("space"))
+			if(Input.GetKeyDown("space"))
 #endif
 					
 			{
@@ -366,7 +366,7 @@ public class GameController : MonoBehaviour
 				}
 			}
 #else
-			if(Input.GetKey("space"))
+			if(Input.GetKeyDown("space"))
 				ObjectInteraction();
 #endif
 			if(Input.GetKey(KeyCode.Escape))
