@@ -23,6 +23,16 @@ public enum ETutorialProgress
 	Preparation,
 }
 
+public enum EAndroidTapType
+{
+	Middle,
+	Left,
+	Right,
+	Up,
+	Down,
+	None
+}
+
 public class GameController : MonoBehaviour 
 {
 	public CameraMgr CameraManager;
@@ -358,7 +368,7 @@ public class GameController : MonoBehaviour
 								}
 								
 							}	
-							if(!realSwipe)
+							if(!realSwipe && GetCurrentTapType() == EAndroidTapType.Middle)
 								ObjectInteraction();
 							
 						break;
@@ -821,5 +831,26 @@ public class GameController : MonoBehaviour
 	{
 		if(TutorialProgress != ETutorialProgress.Finished)
 			TutorialTexts[(int)TutorialProgress].gameObject.SetActive(false);
+	}
+
+	const float sideMargin = 0.25f;
+	const float topMargin = 0.2f;
+	public EAndroidTapType GetCurrentTapType()
+	{
+		if(Input.touchCount == 0)
+			return EAndroidTapType.None;
+
+		var touch = Input.touches[0];
+
+		if(touch.position.y < Screen.height * topMargin)
+			return EAndroidTapType.Down;
+		else if(touch.position.y > Screen.height * (1f - topMargin))
+			return EAndroidTapType.Up;
+		else if(touch.position.x < Screen.width * sideMargin)
+			return EAndroidTapType.Left;
+		else if(touch.position.x > Screen.width * (1f - sideMargin))
+			return EAndroidTapType.Right;
+
+		return EAndroidTapType.Middle;
 	}
 }

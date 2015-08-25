@@ -164,6 +164,16 @@ public class CameraMgr : MonoBehaviour
 		}
 		else
 		{
+#if UNITY_ANDROID
+			if(MyGameController.GetCurrentTapType() == EAndroidTapType.Right)
+				GoTo (Dir.E);
+			else if(MyGameController.GetCurrentTapType() == EAndroidTapType.Left)
+				GoTo (Dir.W);
+			else if(MyGameController.GetCurrentTapType() == EAndroidTapType.Up)
+				GoTo (Dir.N);
+			else if(MyGameController.GetCurrentTapType() == EAndroidTapType.Down)
+				GoTo (Dir.S);
+#else
 			if (Input.GetKey ("right"))
 				GoTo (Dir.E);
 			else if (Input.GetKey ("left"))
@@ -172,6 +182,7 @@ public class CameraMgr : MonoBehaviour
 				GoTo (Dir.N);
 			else if (Input.GetKey ("down"))
 				GoTo (Dir.S);
+#endif
 		}
 	}
 }
