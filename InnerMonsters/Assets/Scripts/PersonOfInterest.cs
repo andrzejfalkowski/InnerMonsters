@@ -39,7 +39,7 @@ public class PersonOfInterest : MonoBehaviour
 
 	public EClothesStyle ClothesStyle;
 
-	const float THOUGHT_DESCRIPTION_TIME = 3f;
+	const float THOUGHT_DESCRIPTION_TIME = 1.5f;
 
 	// TODO: some POIs can be also contrary object for antoher POI, e.g. cat and dog can both be used against each other
 	public PickableObject OwnPickableObject;
